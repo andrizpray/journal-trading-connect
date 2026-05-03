@@ -19,6 +19,14 @@ class JournalEntry extends Model
         'market_condition',
         'strategy_used',
         'auto_imported',
+        'screenshot_path',
+        'tags',
+        'template_type',
+        'plan_setup',
+        'plan_entry',
+        'plan_sl',
+        'plan_tp',
+        'plan_reasoning',
     ];
 
     protected $casts = [
@@ -50,5 +58,12 @@ class JournalEntry extends Model
     public function scopeAutoImported($query)
     {
         return $query->where('auto_imported', true);
+    }
+
+    // Parse comma-separated tags to array
+    public function getTagListAttribute(): array
+    {
+        if (empty($this->tags)) return [];
+        return array_map('trim', explode(',', $this->tags));
     }
 }
