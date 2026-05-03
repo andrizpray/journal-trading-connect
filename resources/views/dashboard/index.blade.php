@@ -82,32 +82,32 @@
     @else
         <div class="overflow-x-auto -mx-4 sm:mx-0">
             <div class="min-w-[480px] sm:min-w-0 px-4 sm:px-0">
-                <table class="w-full text-xs sm:text-sm table-fixed">
+                <table class="w-full text-xs sm:text-sm">
                     <thead>
                         <tr style="color: var(--text-secondary);">
-                            <th class="text-left py-2 font-medium w-[15%]">Tanggal</th>
-                            <th class="text-left py-2 font-medium w-[14%]">Pair</th>
-                            <th class="text-left py-2 font-medium w-[14%]">Tipe</th>
-                            <th class="text-right py-2 font-medium w-[10%]">Lot</th>
-                            <th class="text-right py-2 font-medium w-[22%]">P&L</th>
-                            <th class="text-left py-2 font-medium w-[25%] hidden sm:table-cell">Akun</th>
+                            <th class="text-left py-2 font-medium">Tanggal</th>
+                            <th class="text-left py-2 font-medium">Pair</th>
+                            <th class="text-left py-2 font-medium">Tipe</th>
+                            <th class="text-right py-2 font-medium">Lot</th>
+                            <th class="text-right py-2 font-medium">P&L</th>
+                            <th class="text-left py-2 font-medium hidden sm:table-cell">Akun</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($recentTrades as $trade)
                         <tr class="table-row-hover border-t" style="border-color: var(--border-color);">
-                            <td class="py-2.5 font-mono truncate" style="color: var(--text-secondary);">{{ $trade->close_date?->format('d/m/Y') ?? '-' }}</td>
-                            <td class="py-2.5 font-semibold text-white truncate">{{ $trade->currency_pair }}</td>
-                            <td class="py-2.5 truncate">
+                            <td class="py-2.5 font-mono whitespace-nowrap" style="color: var(--text-secondary);">{{ $trade->close_date?->format('d/m/Y') ?? '-' }}</td>
+                            <td class="py-2.5 font-semibold text-white whitespace-nowrap">{{ $trade->currency_pair }}</td>
+                            <td class="py-2.5 whitespace-nowrap">
                                 <span class="px-2 py-0.5 rounded text-xs font-medium {{ str_starts_with($trade->trade_type, 'buy') ? 'bg-emerald-900/30 text-emerald-400' : 'bg-red-900/30 text-red-400' }}">
                                     {{ strtoupper($trade->trade_type) }}
                                 </span>
                             </td>
-                            <td class="py-2.5 text-right text-white">{{ number_format($trade->lot_size, 2) }}</td>
-                            <td class="py-2.5 text-right font-bold whitespace-nowrap {{ $trade->profit_loss >= 0 ? 'text-emerald-400' : 'text-red-400' }}">
+                            <td class="py-2.5 text-right text-white pr-4">{{ number_format($trade->lot_size, 2) }}</td>
+                            <td class="py-2.5 text-right font-bold whitespace-nowrap pr-4 {{ $trade->profit_loss >= 0 ? 'text-emerald-400' : 'text-red-400' }}">
                                 {{ $trade->profit_loss >= 0 ? '+' : '' }}{{ currency_symbol($trade->tradingAccount?->currency) }}{{ number_format($trade->profit_loss, 2, ',', '.') }}
                             </td>
-                            <td class="hidden sm:table-cell py-2.5 truncate" style="color: var(--text-secondary);">
+                            <td class="hidden sm:table-cell py-2.5 whitespace-nowrap" style="color: var(--text-secondary);">
                                 {{ $trade->tradingAccount?->broker ?? '-' }}
                             </td>
                         </tr>
