@@ -114,13 +114,24 @@
 
         <div class="card p-5">
             <h3 class="text-sm font-semibold text-white mb-3">
-                <i class="fas fa-columns mr-2 text-purple-400"></i>Format CSV
+                <i class="fas fa-columns mr-2 text-purple-400"></i>Format Didukung
             </h3>
-            <p class="text-xs mb-3" style="color: var(--text-secondary);">Kolom yang dikenali (fleksibel):</p>
-            <div class="text-[10px] font-mono p-3 rounded-lg overflow-x-auto" style="background-color: var(--bg-secondary); color: var(--text-secondary);">
-                Ticket, Open Date, Close Date, Type, Lot, Symbol, Open Price, Close Price, SL, TP, Swap, Commission, Profit, Comment
+            <p class="text-xs mb-2" style="color: var(--text-secondary);">Auto-detect dari header kolom. Wajib: <span class="text-white font-medium">Symbol + Profit</span></p>
+            <div class="space-y-2 mb-3">
+                <div class="flex items-center gap-2 text-xs">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-cyan-900/30 text-cyan-400">MT4/MT5</span>
+                    <span style="color: var(--text-secondary);">Ticket, Open Date, Close Date, Type, Lot, Symbol, ...</span>
+                </div>
+                <div class="flex items-center gap-2 text-xs">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-purple-900/30 text-purple-400">TradingView</span>
+                    <span style="color: var(--text-secondary);">Type, Symbol, Qty, Entry Price, Close Price, P&L</span>
+                </div>
+                <div class="flex items-center gap-2 text-xs">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-900/30 text-emerald-400">cTrader</span>
+                    <span style="color: var(--text-secondary);">Trade ID, Symbol, Side, Quantity, Open/Close Time, ...</span>
+                </div>
             </div>
-            <a href="{{ route('import.template') }}" class="btn-secondary flex items-center justify-center gap-2 w-full px-3 py-2 rounded-lg text-xs font-medium mt-3">
+            <a href="{{ route('import.template') }}" class="btn-secondary flex items-center justify-center gap-2 w-full px-3 py-2 rounded-lg text-xs font-medium mt-1">
                 <i class="fas fa-download"></i>Download Template CSV
             </a>
         </div>

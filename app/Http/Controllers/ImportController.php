@@ -58,7 +58,7 @@ class ImportController extends Controller
         $colMap = $this->mapColumns($header);
 
         if (!$colMap) {
-            return back()->with('error', 'Format CSV tidak dikenali. Pastikan kolom: Ticket, Open Date, Close Date, Type, Lot, Symbol, Open Price, Close Price, SL, TP, Swap, Commission, Profit, Comment.');
+            return back()->with('error', 'Format CSV tidak dikenali. Pastikan ada kolom: Symbol dan Profit/P&L. Kolom lain opsional: Type, Lot, Open Date, Close Date, Open Price, Close Price.');
         }
 
         $imported = 0;
@@ -72,10 +72,16 @@ class ImportController extends Controller
             $row = $rows[$i];
             if (count($row) < 5) continue;
 
-            $ticket = trim($row[$colMap['ticket']] ?? '');
+            $ticketCol = $colMap['ticket'];
+            $ticket = ($ticketCol !== false) ? trim($row[$ticketCol] ?? '') : '';
 
             // Skip empty rows
-            if (empty($ticket)) continue;
+            if (empty($ticket) && $ticketCol !== false) continue;
+
+            // Auto-generate ticket if column not present (TradingView etc.)
+            if (empty($ticket)) {
+                $ticket = 'tv_' . $i . '_' . time();
+            }
 
             // Skip already imported
             $exists = TradeHistory::where('user_id', Auth::id())
@@ -199,20 +205,20 @@ class ImportController extends Controller
     private function mapColumns(array $header): ?array
     {
         $mapping = [
-            'ticket' => ['ticket', 'order', 'order ticket', 'order #'],
-            'open_date' => ['open date', 'opentime', 'open time', 'open_date', 'datetime'],
-            'close_date' => ['close date', 'closetime', 'close time', 'close_date', 'time'],
-            'type' => ['type', 'trade type', 'direction', 'side'],
-            'lot' => ['lot', 'lots', 'lotsize', 'lot size', 'volume'],
-            'symbol' => ['symbol', 'pair', 'currency pair', 'instrument', 'currency_pair'],
-            'open_price' => ['open price', 'openprice', 'open', 'price open'],
-            'close_price' => ['close price', 'closeprice', 'close', 'price close'],
-            'sl' => ['sl', 'stop loss', 's/l', 'stoploss'],
-            'tp' => ['tp', 'take profit', 't/p', 'takeprofit'],
-            'swap' => ['swap', 'swaps', 'rollover'],
-            'commission' => ['commission', 'commissions', 'comm'],
-            'profit' => ['profit', 'p&l', 'pnl', 'pl', 'result', 'profit/loss', 'net profit'],
-            'comment' => ['comment', 'comments', 'notes', 'remarks'],
+            'ticket' => ['ticket', 'order', 'order ticket', 'order #', 'trade id', 'position id', 'id'],
+            'open_date' => ['open date', 'opentime', 'open time', 'open_date', 'datetime', 'open time (cet)', 'entry time'],
+            'close_date' => ['close date', 'closetime', 'close time', 'close_date', 'time', 'close time (cet)', 'close time', 'exit time'],
+            'type' => ['type', 'trade type', 'direction', 'side', 'action'],
+            'lot' => ['lot', 'lots', 'lotsize', 'lot size', 'volume', 'qty', 'quantity', 'size', 'amount'],
+            'symbol' => ['symbol', 'pair', 'currency pair', 'instrument', 'currency_pair', 'ticker'],
+            'open_price' => ['open price', 'openprice', 'open', 'price open', 'entry price', 'avg entry price'],
+            'close_price' => ['close price', 'closeprice', 'close', 'price close', 'exit price', 'avg close price'],
+            'sl' => ['sl', 'stop loss', 's/l', 'stoploss', 'stop loss price'],
+            'tp' => ['tp', 'take profit', 't/p', 'takeprofit', 'take profit price'],
+            'swap' => ['swap', 'swaps', 'rollover', 'financing'],
+            'commission' => ['commission', 'commissions', 'comm', 'fee', 'fees'],
+            'profit' => ['profit', 'p&l', 'pnl', 'pl', 'result', 'profit/loss', 'net profit', 'net p/l', 'gross p/l', 'total p/l', 'gain', 'return'],
+            'comment' => ['comment', 'comments', 'notes', 'remarks', 'description', 'label'],
         ];
 
         $result = [];
@@ -226,10 +232,16 @@ class ImportController extends Controller
                     break;
                 }
             }
-            // Required fields
-            if (!$found && in_array($field, ['ticket', 'symbol', 'profit'])) {
+            // Required fields — symbol and profit are required
+            // ticket can be auto-generated if missing
+            if (!$found && in_array($field, ['symbol', 'profit'])) {
                 return null;
             }
+        }
+
+        // Auto-generate ticket column if not found (TradingView etc.)
+        if (!isset($result['ticket'])) {
+            $result['ticket'] = false; // will be auto-generated per row
         }
 
         return $result;
@@ -244,10 +256,15 @@ class ImportController extends Controller
             'Y.m.d H:i:s',
             'd.m.Y H:i:s',
             'd/m/Y H:i:s',
+            'm/d/Y H:i:s',
             'Y-m-d',
             'd.m.Y',
             'd/m/Y',
-            'm/d/Y H:i:s',
+            'm/d/Y',
+            'M d, Y H:i:s',   // TradingView: Jan 15, 2026 08:30
+            'M d Y H:i:s',    // TradingView variant
+            'Y/m/d H:i:s',
+            'd-M-Y H:i:s',    // cTrader: 15-Jan-2026 08:30
         ];
 
         foreach ($formats as $format) {

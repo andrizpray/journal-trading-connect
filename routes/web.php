@@ -7,6 +7,7 @@ use App\Http\Controllers\TradeHistoryController;
 use App\Http\Controllers\JournalController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\AnalyticsController;
+use App\Http\Controllers\ConnectController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -53,6 +54,10 @@ Route::middleware('auth')->group(function () {
 
     // Analytics
     Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
+
+    // Connect
+    Route::get('/connect', [ConnectController::class, 'index'])->name('connect.index');
+    Route::post('/connect/jurnal-trading', [ConnectController::class, 'importFromJurnalTrading'])->name('connect.import-jurnal');
 });
 
 require __DIR__.'/auth.php';

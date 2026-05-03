@@ -273,6 +273,10 @@
                                 <i class="fas fa-file-import w-5 text-center"></i>
                                 <span>Import CSV</span>
                             </a>
+                            <a href="{{ route('connect.index') }}" class="nav-link-sidebar flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('connect.*') ? 'nav-active' : '' }}">
+                                <i class="fas fa-link w-5 text-center"></i>
+                                <span>Connect</span>
+                            </a>
                         </div>
 
                         <div class="mt-6 pt-4 border-t" style="border-color: var(--border-color);">
