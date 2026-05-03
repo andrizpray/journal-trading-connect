@@ -20,6 +20,10 @@ class DummyDataSeeder extends Seeder
                 'password' => bcrypt('password123'),
                 'email_verified_at' => now(),
                 'role' => 'admin',
+                'public_slug' => 'andriz-trading',
+                'public_profile_enabled' => true,
+                'public_visible_fields' => ['overview_stats','equity_curve','pair_performance','risk_metrics','recent_trades','account_info','journal_stats'],
+                'leaderboard_opt_in' => true,
             ]
         );
 
