@@ -170,8 +170,8 @@
                     <tr style="color: var(--text-secondary);" class="text-[10px] uppercase">
                         <th class="text-left py-1.5 pr-3 font-medium">#</th>
                         <th class="text-left py-1.5 pr-3 font-medium">Tanggal</th>
-                        <th class="text-right py-1.5 pr-3 font-medium">Drawdown</th>
-                        <th class="text-right py-1.5 font-medium">Equity</th>
+                        <th class="text-right py-1.5 pr-3 font-medium">P&L Harian</th>
+                        <th class="text-right py-1.5 font-medium">Drawdown</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -179,8 +179,10 @@
                     <tr class="border-t" style="border-color: var(--border-color);">
                         <td class="py-1.5 pr-3" style="color: var(--text-secondary);">{{ $i + 1 }}</td>
                         <td class="py-1.5 pr-3 font-medium">{{ \Carbon\Carbon::parse($dd['date'])->format('d M Y') }}</td>
-                        <td class="py-1.5 pr-3 text-right font-bold text-red-400">-{{ number_format($dd['drawdown'], 2) }}</td>
-                        <td class="py-1.5 text-right font-mono" style="color: var(--text-secondary);">{{ number_format($dd['cum_pnl'], 2) }}</td>
+                        <td class="py-1.5 pr-3 text-right font-bold {{ $dd['daily_pnl'] >= 0 ? 'text-emerald-400' : 'text-red-400' }}">
+                            {{ $dd['daily_pnl'] >= 0 ? '+' : '' }}{{ number_format($dd['daily_pnl'], 2) }}
+                        </td>
+                        <td class="py-1.5 text-right font-bold text-red-400">-{{ number_format($dd['drawdown'], 2) }}</td>
                     </tr>
                     @endforeach
                 </tbody>

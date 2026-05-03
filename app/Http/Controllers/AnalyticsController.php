@@ -163,12 +163,16 @@ class AnalyticsController extends Controller
             ->orderBy('date')
             ->get();
 
-        // Calculate cumulative equity per day, then drawdown
+        // Calculate cumulative equity per day, then drawdown + daily P&L
         $dailyCumPnl = [];
         $cumPnl = 0;
         foreach ($dailyPnlRaw as $row) {
             $cumPnl += $row->pnl;
-            $dailyCumPnl[] = ['date' => $row->date, 'cum' => $cumPnl];
+            $dailyCumPnl[] = [
+                'date' => $row->date,
+                'cum' => $cumPnl,
+                'daily_pnl' => round($row->pnl, 2),
+            ];
         }
 
         $dailyDrawdownList = [];
@@ -181,7 +185,7 @@ class AnalyticsController extends Controller
             $dailyDrawdownList[] = [
                 'date' => $entry['date'],
                 'drawdown' => round($dd, 2),
-                'cum_pnl' => round($entry['cum'], 2),
+                'daily_pnl' => $entry['daily_pnl'],
             ];
         }
 
