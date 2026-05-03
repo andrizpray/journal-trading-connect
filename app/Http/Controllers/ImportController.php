@@ -156,7 +156,7 @@ class ImportController extends Controller
                 }
 
                 $imported++;
-            } catch (\e $e) {
+            } catch (\Exception $e) {
                 $errors[] = "Baris " . ($i + 1) . ": " . $e->getMessage();
             }
         }
@@ -270,14 +270,14 @@ class ImportController extends Controller
         foreach ($formats as $format) {
             try {
                 return \Carbon\Carbon::createFromFormat($format, trim($value));
-            } catch (\e $e) {
+            } catch (\Exception $e) {
                 continue;
             }
         }
 
         try {
             return new \Carbon\Carbon($value);
-        } catch (\e $e) {
+        } catch (\Exception $e) {
             return null;
         }
     }
