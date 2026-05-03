@@ -2,6 +2,26 @@
 @section('page-title', 'Dashboard')
 
 @section('content')
+{{-- Account Filter --}}
+@if($accounts->isNotEmpty() && $accounts->count() > 1)
+<div class="mb-4 flex flex-wrap items-center gap-3">
+    <span class="text-xs" style="color: var(--text-secondary);"><i class="fas fa-filter mr-1"></i>Filter Akun:</span>
+    <form method="GET" action="{{ route('dashboard') }}" class="flex gap-2">
+        <select name="account" onchange="this.form.submit()" class="dark-input text-xs py-1.5 px-3 w-auto">
+            <option value="">Semua Akun</option>
+            @foreach($accounts as $acc)
+                <option value="{{ $acc->id }}" {{ $accountId == $acc->id ? 'selected' : '' }}>
+                    {{ $acc->broker }} ({{ $acc->account_number }})
+                </option>
+            @endforeach
+        </select>
+        @if($accountId)
+            <a href="{{ route('dashboard') }}" class="text-xs text-cyan-400 hover:text-cyan-300">Reset</a>
+        @endif
+    </form>
+</div>
+@endif
+
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 items-stretch">
     <div class="card stat-card stat-card-cyan p-4 sm:p-5 flex flex-col justify-center text-center">
         <div class="text-xs font-medium" style="color: var(--text-secondary);">

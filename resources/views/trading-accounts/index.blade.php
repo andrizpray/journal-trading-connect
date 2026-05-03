@@ -165,7 +165,7 @@
             @endif
 
             {{-- Delete button --}}
-            <form action="{{ route('trading-accounts.destroy', $account->id) }}" method="POST" class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+            <form action="{{ route('trading-accounts.destroy', $account->id) }}" method="POST" class="absolute top-3 right-3 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                 @csrf @method('DELETE')
                 <button type="submit" onclick="return confirm('Hapus akun {{ $account->account_number }}? Semua data trade terkait akan ikut terhapus.')" class="text-gray-500 hover:text-red-400 transition-colors p-1" title="Hapus">
                     <i class="fas fa-trash text-xs"></i>

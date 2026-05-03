@@ -6,7 +6,11 @@
     <h1 class="text-xl sm:text-2xl font-bold text-white">
         <i class="fas fa-file-import mr-2 text-cyan-400"></i>Import CSV
     </h1>
-    <p class="text-sm mt-1" style="color: var(--text-secondary);">Import riwayat trade dari file CSV MT4/MT5</p>
+    <p class="text-sm mt-1" style="color: var(--text-secondary);">
+        Import riwayat trade dari file CSV MT4/MT5
+        <span class="mx-1">·</span>
+        <a href="{{ route('import.logs') }}" class="text-cyan-400 hover:text-cyan-300">Riwayat Import →</a>
+    </p>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
@@ -71,8 +75,8 @@
                 </div>
 
                 {{-- Submit --}}
-                <button type="submit" class="btn-primary w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold">
-                    <i class="fas fa-upload"></i>Import Sekarang
+                <button type="submit" id="importBtn" onclick="handleImportSubmit(this)" class="btn-primary w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold">
+                    <i class="fas fa-upload" id="importIcon"></i><span id="importText">Import Sekarang</span>
                 </button>
             </form>
         @endif
@@ -150,4 +154,15 @@
         </div>
     </div>
 </div>
+
+<script>
+function handleImportSubmit(btn) {
+    var icon = document.getElementById('importIcon');
+    var text = document.getElementById('importText');
+    btn.disabled = true;
+    btn.classList.add('opacity-70', 'cursor-not-allowed');
+    icon.className = 'fas fa-spinner fa-spin';
+    text.textContent = 'Mengimport...';
+}
+</script>
 @endsection

@@ -9,9 +9,14 @@
         </h1>
         <p class="text-sm mt-1" style="color: var(--text-secondary);">{{ $trades->total() }} trade ditemukan</p>
     </div>
-    <a href="{{ route('import.index') }}" class="btn-primary flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium shrink-0">
-        <i class="fas fa-file-import"></i>Import Baru
-    </a>
+    <div class="flex gap-2 shrink-0">
+        <a href="{{ route('import.index') }}" class="btn-primary flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium">
+            <i class="fas fa-file-import"></i>Import
+        </a>
+        <a href="{{ route('trade-history.export', request()->query()) }}" class="btn-secondary flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium">
+            <i class="fas fa-file-export"></i>Export
+        </a>
+    </div>
 </div>
 
 {{-- Filters --}}
@@ -86,6 +91,7 @@
                             <th class="text-center py-2 font-medium">Hasil</th>
                             <th class="text-left py-2 font-medium">Durasi</th>
                             <th class="hidden sm:table-cell text-left py-2 font-medium">Akun</th>
+                            <th class="text-center py-2 font-medium">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -122,6 +128,17 @@
                             </td>
                             <td class="hidden sm:table-cell py-2.5" style="color: var(--text-secondary);">
                                 {{ $trade->tradingAccount?->broker ?? '-' }}
+                            </td>
+                            <td class="py-2.5 text-center whitespace-nowrap">
+                                <a href="{{ route('trade-history.edit', $trade->id) }}" class="text-gray-500 hover:text-cyan-400 transition-colors p-1" title="Edit">
+                                    <i class="fas fa-edit text-xs"></i>
+                                </a>
+                                <form action="{{ route('trade-history.destroy', $trade->id) }}" method="POST" class="inline" onsubmit="return confirm('Hapus trade #{{ $trade->ticket }}?')">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="text-gray-500 hover:text-red-400 transition-colors p-1" title="Hapus">
+                                        <i class="fas fa-trash text-xs"></i>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                         @endforeach

@@ -349,7 +349,10 @@
             </div>
         </div>
         @stack('scripts')
+        {{-- Toast Container --}}
+        <div id="toast-container" class="fixed top-4 right-4 z-[9999] flex flex-col gap-2 pointer-events-none" style="max-width: 360px;"></div>
         <script>
+        // Password toggle
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('.password-toggle-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
@@ -364,7 +367,40 @@
                     }
                 });
             });
+
+            // Auto-show toast from flash messages
+            @if(session('success'))
+            showToast('{{ session('success') }}', 'success');
+            @endif
+            @if(session('error'))
+            showToast('{{ session('error') }}', 'error');
+            @endif
         });
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const colors = {
+                success: 'bg-emerald-900/90 border-emerald-600/50 text-emerald-300',
+                error: 'bg-red-900/90 border-red-600/50 text-red-300',
+                info: 'bg-cyan-900/90 border-cyan-600/50 text-cyan-300',
+            };
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                info: 'fa-info-circle',
+            };
+            toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-lg border backdrop-blur-sm text-sm shadow-lg transform transition-all duration-300 translate-x-full opacity-0 ${colors[type] || colors.info}`;
+            toast.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i><span class="flex-1">${message}</span><button onclick="this.parentElement.remove()" class="opacity-60 hover:opacity-100"><i class="fas fa-times text-xs"></i></button>`;
+            container.appendChild(toast);
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-x-full', 'opacity-0');
+            });
+            setTimeout(() => {
+                toast.classList.add('translate-x-full', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
         </script>
     </body>
 </html>

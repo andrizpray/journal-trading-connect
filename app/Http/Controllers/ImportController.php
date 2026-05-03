@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\TradingAccount;
 use App\Models\TradeHistory;
 use App\Models\JournalEntry;
+use App\Models\ImportLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
@@ -19,6 +20,16 @@ class ImportController extends Controller
             ->get();
 
         return view('import.index', compact('accounts'));
+    }
+
+    public function logs()
+    {
+        $logs = ImportLog::where('user_id', Auth::id())
+            ->with('tradingAccount')
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        return view('import.logs', compact('logs'));
     }
 
     public function import(Request $request)
@@ -149,6 +160,20 @@ class ImportController extends Controller
             'last_synced_at' => now(),
             'total_trades' => TradeHistory::where('trading_account_id', $account->id)->count(),
             'total_pnl' => TradeHistory::where('trading_account_id', $account->id)->sum('profit_loss'),
+        ]);
+
+        // Save import log
+        ImportLog::create([
+            'user_id' => Auth::id(),
+            'trading_account_id' => $account->id,
+            'filename' => $file->getClientOriginalName(),
+            'total_rows' => count($rows) - 1,
+            'imported_count' => $imported,
+            'skipped_count' => $skipped,
+            'error_count' => count($errors),
+            'total_pnl' => $account->fresh()->total_pnl,
+            'status' => $imported > 0 ? 'completed' : 'failed',
+            'notes' => count($errors) > 0 ? implode('; ', array_slice($errors, 0, 5)) : null,
         ]);
 
         return back()->with('success', sprintf(

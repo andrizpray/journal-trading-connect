@@ -29,6 +29,10 @@ Route::middleware('auth')->group(function () {
 
     // Trade History
     Route::get('/trade-history', [TradeHistoryController::class, 'index'])->name('trade-history.index');
+    Route::get('/trade-history/export', [TradeHistoryController::class, 'export'])->name('trade-history.export');
+    Route::get('/trade-history/{id}/edit', [TradeHistoryController::class, 'edit'])->name('trade-history.edit');
+    Route::put('/trade-history/{id}', [TradeHistoryController::class, 'update'])->name('trade-history.update');
+    Route::delete('/trade-history/{id}', [TradeHistoryController::class, 'destroy'])->name('trade-history.destroy');
 
     // Journal
     Route::get('/journal', [JournalController::class, 'index'])->name('journal.index');
@@ -40,6 +44,7 @@ Route::middleware('auth')->group(function () {
     // CSV Import
     Route::get('/import', [ImportController::class, 'index'])->name('import.index');
     Route::post('/import', [ImportController::class, 'import'])->name('import.upload');
+    Route::get('/import/logs', [ImportController::class, 'logs'])->name('import.logs');
     Route::get('/import/template', [ImportController::class, 'template'])->name('import.template');
 });
 
