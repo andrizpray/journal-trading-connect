@@ -75,24 +75,33 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs font-medium mb-1.5" style="color: var(--text-secondary);">Password Saat Ini</label>
-                    <input type="password" name="current_password" required autocomplete="current-password"
-                           class="dark-input w-full">
+                    <div class="password-toggle-wrap">
+                        <input type="password" name="current_password" required autocomplete="current-password"
+                               class="dark-input w-full">
+                        <button type="button" class="password-toggle-btn"><i class="fas fa-eye"></i></button>
+                    </div>
                     @error('current_password')
                         <p class="text-xs text-red-400 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
                 <div>
                     <label class="block text-xs font-medium mb-1.5" style="color: var(--text-secondary);">Password Baru</label>
-                    <input type="password" name="password" required autocomplete="new-password"
-                           class="dark-input w-full">
+                    <div class="password-toggle-wrap">
+                        <input type="password" name="password" required autocomplete="new-password"
+                               class="dark-input w-full">
+                        <button type="button" class="password-toggle-btn"><i class="fas fa-eye"></i></button>
+                    </div>
                     @error('password')
                         <p class="text-xs text-red-400 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
                 <div>
                     <label class="block text-xs font-medium mb-1.5" style="color: var(--text-secondary);">Konfirmasi Password Baru</label>
-                    <input type="password" name="password_confirmation" required autocomplete="new-password"
-                           class="dark-input w-full">
+                    <div class="password-toggle-wrap">
+                        <input type="password" name="password_confirmation" required autocomplete="new-password"
+                               class="dark-input w-full">
+                        <button type="button" class="password-toggle-btn"><i class="fas fa-eye"></i></button>
+                    </div>
                 </div>
             </div>
             <div class="mt-5">

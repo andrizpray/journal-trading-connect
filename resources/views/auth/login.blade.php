@@ -19,8 +19,11 @@
         {{-- Password --}}
         <div class="mb-5">
             <label class="block text-xs font-medium mb-1.5" style="color: #9ca3af;">Password</label>
-            <input id="password" type="password" name="password" required autocomplete="current-password"
-                   class="dark-input" placeholder="Masukkan password">
+            <div class="password-toggle-wrap">
+                <input id="password" type="password" name="password" required autocomplete="current-password"
+                       class="dark-input" placeholder="Masukkan password">
+                <button type="button" class="password-toggle-btn"><i class="fas fa-eye"></i></button>
+            </div>
             @error('password')
                 <p class="text-xs text-red-400 mt-1">{{ $message }}</p>
             @enderror

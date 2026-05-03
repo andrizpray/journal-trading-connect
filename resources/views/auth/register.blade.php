@@ -27,8 +27,11 @@
         {{-- Password --}}
         <div class="mb-4">
             <label class="block text-xs font-medium mb-1.5" style="color: #9ca3af;">Password</label>
-            <input id="password" type="password" name="password" required autocomplete="new-password"
-                   class="dark-input" placeholder="Min. 8 karakter">
+            <div class="password-toggle-wrap">
+                <input id="password" type="password" name="password" required autocomplete="new-password"
+                       class="dark-input" placeholder="Min. 8 karakter">
+                <button type="button" class="password-toggle-btn"><i class="fas fa-eye"></i></button>
+            </div>
             @error('password')
                 <p class="text-xs text-red-400 mt-1">{{ $message }}</p>
             @enderror
@@ -37,8 +40,11 @@
         {{-- Confirm Password --}}
         <div class="mb-5">
             <label class="block text-xs font-medium mb-1.5" style="color: #9ca3af;">Konfirmasi Password</label>
-            <input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password"
-                   class="dark-input" placeholder="Ulangi password">
+            <div class="password-toggle-wrap">
+                <input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password"
+                       class="dark-input" placeholder="Ulangi password">
+                <button type="button" class="password-toggle-btn"><i class="fas fa-eye"></i></button>
+            </div>
         </div>
 
         {{-- Submit --}}

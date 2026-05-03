@@ -36,6 +36,23 @@
                 box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
             }
             .dark-input::placeholder { color: #6b7280; }
+
+            /* Password toggle */
+            .password-toggle-wrap { position: relative; }
+            .password-toggle-wrap input { padding-right: 2.5rem; }
+            .password-toggle-btn {
+                position: absolute;
+                right: 0.75rem;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #6b7280;
+                cursor: pointer;
+                padding: 0.25rem;
+                transition: color 0.2s;
+                background: none;
+                border: none;
+            }
+            .password-toggle-btn:hover { color: #9ca3af; }
             .btn-primary {
                 background: linear-gradient(135deg, #06b6d4, #0891b2);
                 color: white;
@@ -68,5 +85,22 @@
                 &copy; {{ date('Y') }} Journal Trading Connect
             </p>
         </div>
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.password-toggle-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const input = this.parentElement.querySelector('input');
+                    const icon = this.querySelector('i');
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        icon.classList.replace('fa-eye', 'fa-eye-slash');
+                    } else {
+                        input.type = 'password';
+                        icon.classList.replace('fa-eye-slash', 'fa-eye');
+                    }
+                });
+            });
+        });
+        </script>
     </body>
 </html>
