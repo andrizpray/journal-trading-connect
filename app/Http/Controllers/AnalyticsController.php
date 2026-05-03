@@ -155,6 +155,43 @@ class AnalyticsController extends Controller
             if ($dd > $maxDrawdown) $maxDrawdown = $dd;
         }
 
+        // Daily Drawdown (per hari, terburuk 10)
+        $dailyPnlRaw = (clone $query)
+            ->whereNotNull('close_date')
+            ->selectRaw('DATE(close_date) as date, SUM(profit_loss) as pnl')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        // Calculate cumulative equity per day, then drawdown
+        $dailyCumPnl = [];
+        $cumPnl = 0;
+        foreach ($dailyPnlRaw as $row) {
+            $cumPnl += $row->pnl;
+            $dailyCumPnl[] = ['date' => $row->date, 'cum' => $cumPnl];
+        }
+
+        $dailyDrawdownList = [];
+        $ddHighWater = 0;
+        foreach ($dailyCumPnl as $entry) {
+            if ($entry['cum'] > $ddHighWater) {
+                $ddHighWater = $entry['cum'];
+            }
+            $dd = $ddHighWater - $entry['cum'];
+            $dailyDrawdownList[] = [
+                'date' => $entry['date'],
+                'drawdown' => round($dd, 2),
+                'cum_pnl' => round($entry['cum'], 2),
+            ];
+        }
+
+        // Sort by drawdown descending, take top 10 worst days
+        $dailyDrawdownList = collect($dailyDrawdownList)
+            ->sortByDesc('drawdown')
+            ->take(10)
+            ->values()
+            ->all();
+
         // R:R ratio (average win / average |loss|)
         $rrRatio = $avgLoss != 0 ? round(abs($avgWin / $avgLoss), 2) : 0;
 
@@ -189,7 +226,7 @@ class AnalyticsController extends Controller
             'heatmap', 'dayNames', 'maxTrades',
             'maxWinStreak', 'maxLossStreak', 'currentStreak', 'currentStreakType',
             'avgWin', 'avgLoss', 'profitFactor', 'maxWin', 'maxLoss',
-            'maxDrawdown', 'rrRatio',
+            'maxDrawdown', 'rrRatio', 'dailyDrawdownList',
             'accountComparison',
             'accounts', 'accountId',
         ));

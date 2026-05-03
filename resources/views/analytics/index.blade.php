@@ -157,6 +157,37 @@
             <div class="text-lg font-bold text-red-400 mt-1">{{ number_format($maxLoss, 2) }}</div>
         </div>
     </div>
+
+    {{-- Daily Drawdown Table --}}
+    @if(count($dailyDrawdownList) > 0)
+    <div class="card p-4 mt-4">
+        <h3 class="text-sm font-semibold mb-3" style="color: var(--text-secondary);">
+            <i class="fas fa-arrow-trend-down mr-1 text-red-400"></i>Daily Drawdown — 10 Hari Terburuk
+        </h3>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr style="color: var(--text-secondary);" class="text-[10px] uppercase">
+                        <th class="text-left py-1.5 pr-3 font-medium">#</th>
+                        <th class="text-left py-1.5 pr-3 font-medium">Tanggal</th>
+                        <th class="text-right py-1.5 pr-3 font-medium">Drawdown</th>
+                        <th class="text-right py-1.5 font-medium">Equity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($dailyDrawdownList as $i => $dd)
+                    <tr class="border-t" style="border-color: var(--border-color);">
+                        <td class="py-1.5 pr-3" style="color: var(--text-secondary);">{{ $i + 1 }}</td>
+                        <td class="py-1.5 pr-3 font-medium">{{ \Carbon\Carbon::parse($dd['date'])->format('d M Y') }}</td>
+                        <td class="py-1.5 pr-3 text-right font-bold text-red-400">-{{ number_format($dd['drawdown'], 2) }}</td>
+                        <td class="py-1.5 text-right font-mono" style="color: var(--text-secondary);">{{ number_format($dd['cum_pnl'], 2) }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
 </div>
 
 {{-- 2.4 — Heatmap Trading --}}
