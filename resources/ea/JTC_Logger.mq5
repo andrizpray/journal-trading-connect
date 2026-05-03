@@ -84,6 +84,23 @@ void OnDeinit(const int reason)
 }
 
 //+------------------------------------------------------------------+
+//| OnCalculate - required for custom indicators                    |
+//+------------------------------------------------------------------+
+int OnCalculate(const int rates_total,
+                const int prev_calculated,
+                const datetime &time[],
+                const double &open[],
+                const double &high[],
+                const double &low[],
+                const double &close[],
+                const long &tick_volume[],
+                const long &volume[],
+                const int &spread[])
+{
+   return(rates_total);
+}
+
+//+------------------------------------------------------------------+
 //| Timer event - periodic sync                                     |
 //+------------------------------------------------------------------+
 void OnTimer()
@@ -227,14 +244,14 @@ void SendTradeHistory()
       json += "\"close_date\":\"" + TimeToString(orderTime, TIME_DATE|TIME_MINUTES) + "\",";
       json += "\"currency_pair\":\"" + symbol + "\",";
       json += "\"trade_type\":\"" + tradeType + "\",";
-      json += "\"lot_size\":" + DoubleToStr(volume, 2) + ",";
-      json += "\"open_price\":" + DoubleToStr(openPrice, digits) + ",";
-      json += "\"close_price\":" + DoubleToStr(price, digits) + ",";
+      json += "\"lot_size\":" + DoubleToString(volume, 2) + ",";
+      json += "\"open_price\":" + DoubleToString(openPrice, digits) + ",";
+      json += "\"close_price\":" + DoubleToString(price, digits) + ",";
       json += "\"stop_loss\":0,";
       json += "\"take_profit\":0,";
-      json += "\"swap\":" + DoubleToStr(swap, 2) + ",";
-      json += "\"commission\":" + DoubleToStr(comm, 2) + ",";
-      json += "\"profit_loss\":" + DoubleToStr(totalProfit, 2) + ",";
+      json += "\"swap\":" + DoubleToString(swap, 2) + ",";
+      json += "\"commission\":" + DoubleToString(comm, 2) + ",";
+      json += "\"profit_loss\":" + DoubleToString(totalProfit, 2) + ",";
       json += "\"duration_minutes\":" + IntegerToString(duration) + ",";
       json += "\"comment\":\"" + comment + "\"";
       json += "}";
@@ -281,14 +298,19 @@ string SendRequest(string endpoint, string jsonBody)
 {
    string url = InpServerUrl + endpoint;
    string headers = "";
-   string result = "";
-   string cookie = "";
    int timeout = 5000;
 
    headers = "Content-Type: application/json\r\n";
    headers += "Authorization: Bearer " + InpApiToken;
 
-   int res = WebRequest("POST", url, headers, timeout, jsonBody, result, cookie);
+   uchar dataOut[];
+   uchar dataIn[];
+   string responseHeaders = "";
+   StringToCharArray(jsonBody, dataOut, 0, StringLen(jsonBody));
+
+   int res = WebRequest("POST", url, headers, timeout, dataOut, dataIn, responseHeaders);
+
+   string result = CharArrayToString(dataIn);
 
    if(res == -1)
    {
