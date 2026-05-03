@@ -19,6 +19,7 @@ class DummyDataSeeder extends Seeder
                 'name' => 'Andriz',
                 'password' => bcrypt('password123'),
                 'email_verified_at' => now(),
+                'role' => 'admin',
             ]
         );
 

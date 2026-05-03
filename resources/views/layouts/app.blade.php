@@ -284,6 +284,14 @@
                                 <span class="text-xs font-semibold uppercase tracking-wider" style="color: var(--text-secondary);">Menu</span>
                             </div>
                             <div class="space-y-1 mt-1">
+                                @auth
+                                    @if(auth()->user()->isAdmin())
+                                        <a href="{{ route('admin.dashboard') }}" class="nav-link-sidebar flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.*') ? 'nav-active' : '' }}">
+                                            <i class="fas fa-shield-halved w-5 text-center text-amber-400"></i>
+                                            <span>Admin Panel</span>
+                                        </a>
+                                    @endif
+                                @endauth
                                 <a href="{{ route('profile.edit') }}" class="nav-link-sidebar flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium">
                                     <i class="fas fa-cog w-5 text-center"></i>
                                     <span>Pengaturan</span>

@@ -8,6 +8,7 @@ use App\Http\Controllers\JournalController;
 use App\Http\Controllers\ImportController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\ConnectController;
+use App\Http\Controllers\AdminController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -58,6 +59,15 @@ Route::middleware('auth')->group(function () {
     // Connect
     Route::get('/connect', [ConnectController::class, 'index'])->name('connect.index');
     Route::post('/connect/jurnal-trading', [ConnectController::class, 'importFromJurnalTrading'])->name('connect.import-jurnal');
+
+    // Admin (only accessible by admin users)
+    Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+        Route::get('/users', [AdminController::class, 'users'])->name('users');
+        Route::patch('/users/{id}/role', [AdminController::class, 'updateUserRole'])->name('update-role');
+        Route::get('/users/{id}', [AdminController::class, 'viewUser'])->name('user-detail');
+        Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('delete-user');
+    });
 });
 
 require __DIR__.'/auth.php';
