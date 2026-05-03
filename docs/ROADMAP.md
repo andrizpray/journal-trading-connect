@@ -67,11 +67,11 @@
 ## 👥 Phase 5 — Multi-user & Kolaborasi
 *Target: siap untuk multiple user*
 
-| # | Fitur | Deskripsi |
-|---|-------|-----------|
-| 5.1 | **Role system** | Admin (lihat semua) + User (hanya data sendiri) |
-| 5.2 | **Leaderboard** | Ranking win rate antar user (opt-in) |
-| 5.3 | **Public profile** | Share stats publik via link (pilih apa yang visible) |
+| # | Fitur | Deskripsi | Status |
+|---|-------|-----------|--------|
+| 5.1 | **Role system** | Admin (lihat semua) + User (hanya data sendiri) | ✅ Selesai |
+| 5.2 | **Leaderboard** | Ranking win rate antar user (opt-in) | ✅ Selesai |
+| 5.3 | **Public profile** | Share stats publik via link (pilih apa yang visible) | ✅ Selesai |
 
 ---
 
