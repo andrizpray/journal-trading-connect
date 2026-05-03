@@ -47,14 +47,29 @@ class ImportController extends Controller
         $autoJournal = $request->has('auto_journal');
 
         $path = $file->getRealPath();
-        $rows = array_map('str_getcsv', file($path));
+        $allRows = array_map('str_getcsv', file($path));
 
-        if (count($rows) < 2) {
+        if (count($allRows) < 2) {
             return back()->with('error', 'File CSV kosong atau tidak valid.');
         }
 
+        // Detect MT5 report format (has "Positions" header before actual data)
+        $headerRowIdx = 0;
+        $startRowIdx = 1;
+        foreach ($allRows as $idx => $row) {
+            $firstCell = strtolower(trim($row[0] ?? ''));
+            if (strpos($firstCell, 'positions') !== false || strpos($firstCell, 'closed positions') !== false) {
+                // Next row is the actual header
+                $headerRowIdx = $idx + 1;
+                $startRowIdx = $idx + 2;
+                break;
+            }
+        }
+
+        $rows = array_slice($allRows, $headerRowIdx);
+
         // Parse header - detect column positions
-        $header = array_map('trim', array_map('strtolower', $rows[0]));
+        $header = array_map('trim', array_map('strtolower', $rows[0] ?? []));
         $colMap = $this->mapColumns($header);
 
         if (!$colMap) {
@@ -68,7 +83,7 @@ class ImportController extends Controller
         $skipped = 0;
         $errors = [];
 
-        for ($i = 1; $i < count($rows); $i++) {
+        for ($i = $startRowIdx - $headerRowIdx; $i < count($rows); $i++) {
             $row = $rows[$i];
             if (count($row) < 5) continue;
 
@@ -205,7 +220,7 @@ class ImportController extends Controller
     private function mapColumns(array $header): ?array
     {
         $mapping = [
-            'ticket' => ['ticket', 'order', 'order ticket', 'order #', 'trade id', 'position id', 'id'],
+            'ticket' => ['ticket', 'order', 'order ticket', 'order #', 'trade id', 'position id', 'id', 'position'],
             'open_date' => ['open date', 'opentime', 'open time', 'open_date', 'datetime', 'open time (cet)', 'entry time'],
             'close_date' => ['close date', 'closetime', 'close time', 'close_date', 'time', 'close time (cet)', 'close time', 'exit time'],
             'type' => ['type', 'trade type', 'direction', 'side', 'action'],
@@ -213,8 +228,8 @@ class ImportController extends Controller
             'symbol' => ['symbol', 'pair', 'currency pair', 'instrument', 'currency_pair', 'ticker'],
             'open_price' => ['open price', 'openprice', 'open', 'price open', 'entry price', 'avg entry price'],
             'close_price' => ['close price', 'closeprice', 'close', 'price close', 'exit price', 'avg close price'],
-            'sl' => ['sl', 'stop loss', 's/l', 'stoploss', 'stop loss price'],
-            'tp' => ['tp', 'take profit', 't/p', 'takeprofit', 'take profit price'],
+            'sl' => ['sl', 'stop loss', 's/l', 'stoploss', 'stop loss price', 's / l'],
+            'tp' => ['tp', 'take profit', 't/p', 'takeprofit', 'take profit price', 't / p'],
             'swap' => ['swap', 'swaps', 'rollover', 'financing'],
             'commission' => ['commission', 'commissions', 'comm', 'fee', 'fees'],
             'profit' => ['profit', 'p&l', 'pnl', 'pl', 'result', 'profit/loss', 'net profit', 'net p/l', 'gross p/l', 'total p/l', 'gain', 'return'],
