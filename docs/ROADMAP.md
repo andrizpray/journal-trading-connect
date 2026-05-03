@@ -80,10 +80,10 @@
 
 | # | Fitur | Deskripsi |
 |---|-------|-----------|
-| 6.1 | **PWA manifest** | Installable di homescreen, offline splash screen |
-| 6.2 | **Service worker** | Cache halaman utama untuk akses offline |
-| 6.3 | **Mobile-optimized journal** | Quick-add trade via mobile (minimal form) |
-| 6.4 | **Push notification** | Reminder daily journal, weekly review |
+| 6.1 | **PWA manifest** | Installable di homescreen, offline splash screen | ✅ Selesai |
+| 6.2 | **Service worker** | Cache halaman utama untuk akses offline | ✅ Selesai |
+| 6.3 | **Mobile-optimized journal** | Quick-add trade via mobile (minimal form) | ✅ Selesai |
+| 6.4 | **Push notification** | Reminder daily journal, weekly review (infra, needs HTTPS) | ✅ Selesai |
 
 ---
 
