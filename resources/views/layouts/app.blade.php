@@ -485,6 +485,189 @@
             .theme-neobrutalism canvas {
                 border-radius: 0;
             }
+
+            /* ============================================
+               NEOBRUTALISM TEXT COLOR FIXES
+               Override dark-theme Tailwind classes for light bg
+               ============================================ */
+
+            /* text-white → dark text (exceptions: buttons, gradient avatars, badges with dark bg) */
+            .theme-neobrutalism .text-white {
+                color: var(--text-primary) !important;
+            }
+            .theme-neobrutalism button .text-white,
+            .theme-neobrutalism .btn-primary .text-white,
+            .theme-neobrutalism .btn-danger .text-white,
+            .theme-neobrutalism .bg-cyan-600 .text-white,
+            .theme-neobrutalism .bg-red-600 .text-white,
+            .theme-neobrutalism [style*="gradient"] .text-white,
+            .theme-neobrutalism [style*="linear-gradient"] .text-white,
+            .theme-neobrutalism .w-8.h-8.rounded-full .text-white,
+            .theme-neobrutalism .w-9.h-9.rounded-lg .text-white,
+            .theme-neobrutalism .bg-emerald-600 .text-white {
+                color: #ffffff !important;
+            }
+
+            /* text-gray-400 → visible secondary */
+            .theme-neobrutalism .text-gray-400 {
+                color: var(--text-secondary) !important;
+            }
+            .theme-neobrutalism .text-gray-300 {
+                color: var(--text-secondary) !important;
+            }
+
+            /* text-gray-500 → slightly darker secondary */
+            .theme-neobrutalism .text-gray-500 {
+                color: #6b6b8a !important;
+            }
+
+            /* Colored text → darker variants for light background */
+            .theme-neobrutalism .text-emerald-400 {
+                color: #059669 !important;
+            }
+            .theme-neobrutalism .text-red-400 {
+                color: #dc2626 !important;
+            }
+            .theme-neobrutalism .text-cyan-400 {
+                color: #0891b2 !important;
+            }
+            .theme-neobrutalism .text-yellow-400 {
+                color: #b45309 !important;
+            }
+            .theme-neobrutalism .text-amber-400 {
+                color: #d97706 !important;
+            }
+            .theme-neobrutalism .text-orange-400 {
+                color: #ea580c !important;
+            }
+            .theme-neobrutalism .text-purple-400 {
+                color: #7c3aed !important;
+            }
+            .theme-neobrutalism .text-violet-400 {
+                color: #7c3aed !important;
+            }
+
+            /* Hover targets for colored text → also darker */
+            .theme-neobrutalism .text-cyan-400.hover\:text-cyan-300:hover,
+            .theme-neobrutalism .text-red-400.hover\:text-red-300:hover,
+            .theme-neobrutalism .text-gray-400.hover\:text-white:hover {
+                color: var(--text-primary) !important;
+            }
+            .theme-neobrutalism .text-gray-500.hover\:text-cyan-400:hover,
+            .theme-neobrutalism .text-gray-500.hover\:text-amber-400:hover {
+                color: var(--accent-cyan) !important;
+            }
+            .theme-neobrutalism .text-gray-500.hover\:text-red-400:hover {
+                color: var(--accent-red) !important;
+            }
+
+            /* Badge backgrounds: dark bg → light bg */
+            .theme-neobrutalism .bg-emerald-900\/30,
+            .theme-neobrutalism .bg-emerald-900\/50 {
+                background-color: #d1fae5 !important;
+                border-color: var(--accent-green) !important;
+            }
+            .theme-neobrutalism .bg-red-900\/30,
+            .theme-neobrutalism .bg-red-900\/50 {
+                background-color: #fee2e2 !important;
+                border-color: var(--accent-red) !important;
+            }
+            .theme-neobrutalism .bg-cyan-900\/30,
+            .theme-neobrutalism .bg-cyan-900\/50 {
+                background-color: #cffafe !important;
+                border-color: #0891b2 !important;
+            }
+            .theme-neobrutalism .bg-amber-900\/50,
+            .theme-neobrutalism .bg-orange-900\/50 {
+                background-color: #fef3c7 !important;
+                border-color: var(--accent-yellow) !important;
+            }
+            .theme-neobrutalism .bg-gray-700\/50,
+            .theme-neobrutalism .bg-gray-700\/30 {
+                background-color: #f3f4f6 !important;
+                border-color: #9ca3af !important;
+            }
+            .theme-neobrutalism .bg-gray-800\/50 {
+                background-color: #e5e7eb !important;
+                border-color: #6b7280 !important;
+            }
+
+            /* Flash/alert messages */
+            .theme-neobrutalism .bg-emerald-900\/30.border-emerald-700\/50 {
+                background: #d1fae5 !important;
+                border-color: var(--accent-green) !important;
+                color: #065f46 !important;
+            }
+            .theme-neobrutalism .bg-red-900\/30.border-red-700\/50 {
+                background: #fee2e2 !important;
+                border-color: var(--accent-red) !important;
+                color: #991b1b !important;
+            }
+            .theme-neobrutalism .bg-red-900\/30.border-red-800\/50 {
+                background: #fee2e2 !important;
+                border-color: var(--accent-red) !important;
+            }
+
+            /* Dark element backgrounds → light */
+            .theme-neobrutalism .bg-gray-800 {
+                background-color: var(--bg-secondary) !important;
+            }
+            .theme-neobrutalism .bg-gray-900,
+            .theme-neobrutalism .bg-gray-900\/30 {
+                background-color: var(--bg-card) !important;
+            }
+            .theme-neobrutalism .bg-gray-900\/50 {
+                background-color: #f9fafb !important;
+            }
+
+            /* Dark borders → visible borders */
+            .theme-neobrutalism .border-gray-700\/50,
+            .theme-neobrutalism .border-gray-700 {
+                border-color: #d1d5db !important;
+            }
+
+            /* Pagination dark → neobrutalism */
+            .theme-neobrutalism .bg-gray-900.hover\:bg-gray-800,
+            .theme-neobrutalism .bg-gray-800.border-gray-700 {
+                background: white !important;
+                border-color: var(--border-color) !important;
+            }
+
+            /* Header bar text (already has .theme-neobrutalism header but text-white needs override) */
+            .theme-neobrutalism header .text-white {
+                color: var(--text-primary) !important;
+            }
+
+            /* Sidebar logo text */
+            .theme-neobrutalism aside .text-white {
+                color: var(--text-primary) !important;
+            }
+
+            /* Leaderboard podium */
+            .theme-neobrutalism .bg-cyan-600 {
+                background: var(--accent-cyan) !important;
+            }
+            .theme-neobrutalism .bg-emerald-600 {
+                background: var(--accent-green) !important;
+            }
+            .theme-neobrutalism .bg-red-600 {
+                background: var(--accent-red) !important;
+            }
+
+            /* Heatmap cells with inline styles */
+            .theme-neobrutalism .bg-green-500\/20 {
+                background: rgba(46, 196, 182, 0.2) !important;
+            }
+            .theme-neobrutalism .bg-red-500\/20 {
+                background: rgba(231, 29, 54, 0.15) !important;
+            }
+
+            /* Code blocks */
+            .theme-neobrutalism .bg-gray-800 code,
+            .theme-neobrutalism code.bg-gray-800 {
+                background: var(--bg-secondary) !important;
+                color: var(--text-primary) !important;
+            }
         </style>
     </head>
     <body class="antialiased {{ auth()->check() ? 'theme-' . auth()->user()->theme : 'theme-dark' }}">
