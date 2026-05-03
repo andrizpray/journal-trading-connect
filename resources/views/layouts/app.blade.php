@@ -277,6 +277,10 @@
                                 <i class="fas fa-link w-5 text-center"></i>
                                 <span>Connect</span>
                             </a>
+                            <a href="{{ route('leaderboard.index') }}" class="nav-link-sidebar flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('leaderboard.*') ? 'nav-active' : '' }}">
+                                <i class="fas fa-trophy w-5 text-center text-amber-400"></i>
+                                <span>Leaderboard</span>
+                            </a>
                         </div>
 
                         <div class="mt-6 pt-4 border-t" style="border-color: var(--border-color);">
