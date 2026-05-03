@@ -6,6 +6,7 @@ use App\Http\Controllers\TradingAccountController;
 use App\Http\Controllers\TradeHistoryController;
 use App\Http\Controllers\JournalController;
 use App\Http\Controllers\ImportController;
+use App\Http\Controllers\AnalyticsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -46,6 +47,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/import', [ImportController::class, 'import'])->name('import.upload');
     Route::get('/import/logs', [ImportController::class, 'logs'])->name('import.logs');
     Route::get('/import/template', [ImportController::class, 'template'])->name('import.template');
+
+    // Analytics
+    Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
 });
 
 require __DIR__.'/auth.php';

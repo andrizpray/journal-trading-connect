@@ -261,6 +261,10 @@
                                 <i class="fas fa-history w-5 text-center"></i>
                                 <span>Riwayat Trade</span>
                             </a>
+                            <a href="{{ route('analytics.index') }}" class="nav-link-sidebar flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('analytics.*') ? 'nav-active' : '' }}">
+                                <i class="fas fa-chart-pie w-5 text-center"></i>
+                                <span>Analytics</span>
+                            </a>
                             <a href="{{ route('journal.index') }}" class="nav-link-sidebar flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('journal.*') ? 'nav-active' : '' }}">
                                 <i class="fas fa-book-open w-5 text-center"></i>
                                 <span>Jurnal Trading</span>
