@@ -29,18 +29,21 @@ class DummyDataSeeder extends Seeder
                 'account_name' => 'Akun Utama',
                 'broker' => 'OctaFX',
                 'platform' => 'mt5',
+                'currency' => 'USD',
             ],
             [
                 'account_number' => '87654321',
                 'account_name' => 'Akun Scalping',
                 'broker' => 'XM',
                 'platform' => 'mt5',
+                'currency' => 'USD',
             ],
             [
                 'account_number' => '11223344',
                 'account_name' => null,
                 'broker' => 'ICMarkets',
                 'platform' => 'mt4',
+                'currency' => 'USD',
             ],
         ];
 

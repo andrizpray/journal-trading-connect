@@ -12,7 +12,7 @@ class JournalController extends Controller
     public function index(Request $request)
     {
         $query = JournalEntry::where('user_id', Auth::id())
-            ->with('tradeHistory');
+            ->with('tradeHistory.tradingAccount');
 
         if ($request->filled('result')) {
             $query->where('result', $request->result);

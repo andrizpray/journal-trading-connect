@@ -81,7 +81,7 @@
         </div>
     @else
         <div class="overflow-x-auto -mx-4 sm:mx-0">
-            <div class="min-w-[500px] sm:min-w-0 px-4 sm:px-0">
+            <div class="min-w-[480px] sm:min-w-0 px-4 sm:px-0">
                 <table class="w-full text-xs sm:text-sm">
                     <thead>
                         <tr style="color: var(--text-secondary);">
@@ -89,8 +89,8 @@
                             <th class="text-left py-2 font-medium">Pair</th>
                             <th class="text-left py-2 font-medium">Tipe</th>
                             <th class="text-right py-2 font-medium">Lot</th>
-                            <th class="text-right py-2 font-medium">P&L</th>
-                            <th class="text-left py-2 font-medium">Akun</th>
+                            <th class="text-right py-2 font-medium w-24 sm:w-auto">P&L</th>
+                            <th class="text-left py-2 font-medium hidden sm:table-cell">Akun</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -104,10 +104,14 @@
                                 </span>
                             </td>
                             <td class="py-2.5 text-right text-white">{{ number_format($trade->lot_size, 2) }}</td>
-                            <td class="py-2.5 text-right font-bold {{ $trade->profit_loss >= 0 ? 'text-emerald-400' : 'text-red-400' }}">
+                            <td class="py-2.5 text-right font-bold whitespace-nowrap {{ $trade->profit_loss >= 0 ? 'text-emerald-400' : 'text-red-400' }}">
                                 {{ $trade->profit_loss >= 0 ? '+' : '' }}{{ number_format($trade->profit_loss, 2, ',', '.') }}
+                                <span class="text-[9px] font-normal opacity-60 ml-0.5">{{ $trade->tradingAccount?->currency ?? 'USD' }}</span>
                             </td>
-                            <td class="py-2.5" style="color: var(--text-secondary);">{{ $trade->tradingAccount?->broker ?? '-' }}</td>
+                            <td class="hidden sm:table-cell py-2.5" style="color: var(--text-secondary);">
+                                {{ $trade->tradingAccount?->broker ?? '-' }}
+                                <span class="text-[9px] opacity-60">({{ $trade->tradingAccount?->currency ?? 'USD' }})</span>
+                            </td>
                         </tr>
                         @endforeach
                     </tbody>

@@ -44,6 +44,16 @@
                         <option value="other">Lainnya</option>
                     </select>
                 </div>
+                <div>
+                    <label class="block text-xs font-medium mb-1.5" style="color: var(--text-secondary);">Mata Uang *</label>
+                    <select name="currency" required class="dark-input w-full">
+                        <option value="USD">USD</option>
+                        <option value="IDR">IDR</option>
+                        <option value="EUR">EUR</option>
+                        <option value="GBP">GBP</option>
+                        <option value="Cent">Cent (USC)</option>
+                    </select>
+                </div>
             </div>
             <div class="flex gap-3 mt-6">
                 <button type="button" onclick="document.getElementById('addAccountModal').classList.add('hidden')" class="btn-secondary flex-1 px-4 py-2.5 rounded-lg text-sm font-medium">
@@ -88,6 +98,9 @@
                 <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase {{ $account->platform === 'mt5' ? 'bg-cyan-900/30 text-cyan-400' : 'bg-purple-900/30 text-purple-400' }}">
                     {{ $account->platform }}
                 </span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-700/50 text-gray-300">
+                    {{ $account->currency }}
+                </span>
             </div>
 
             @if($account->account_name)
@@ -105,6 +118,7 @@
                     <div class="text-[10px] uppercase" style="color: var(--text-secondary);">Total P&L</div>
                     <div class="text-sm font-bold {{ $account->total_pnl >= 0 ? 'text-emerald-400' : 'text-red-400' }}">
                         {{ $account->total_pnl >= 0 ? '+' : '' }}{{ number_format($account->total_pnl, 0, ',', '.') }}
+                        <span class="text-[9px] font-normal opacity-60">{{ $account->currency }}</span>
                     </div>
                 </div>
             </div>

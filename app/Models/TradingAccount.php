@@ -12,6 +12,7 @@ class TradingAccount extends Model
         'account_name',
         'broker',
         'platform',
+        'currency',
         'sync_method',
         'is_active',
         'last_synced_at',
