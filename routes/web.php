@@ -10,6 +10,7 @@ use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\ConnectController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LeaderboardController;
+use App\Http\Controllers\PublicProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -18,6 +19,9 @@ Route::get('/', function () {
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])->name('dashboard');
+
+// Public profile (no auth required)
+Route::get('/u/{slug}', [PublicProfileController::class, 'show'])->name('public-profile.show');
 
 Route::middleware('auth')->group(function () {
     // Profile
@@ -60,6 +64,11 @@ Route::middleware('auth')->group(function () {
     // Leaderboard
     Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard.index');
     Route::post('/leaderboard/toggle', [LeaderboardController::class, 'toggleOptIn'])->name('leaderboard.toggle');
+
+    // Public Profile Settings
+    Route::get('/public-profile', [PublicProfileController::class, 'settings'])->name('public-profile.settings');
+    Route::patch('/public-profile', [PublicProfileController::class, 'update'])->name('public-profile.update');
+    Route::post('/public-profile/regenerate-slug', [PublicProfileController::class, 'regenerateSlug'])->name('public-profile.regenerate-slug');
 
     // Connect
     Route::get('/connect', [ConnectController::class, 'index'])->name('connect.index');

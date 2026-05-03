@@ -296,6 +296,10 @@
                                         </a>
                                     @endif
                                 @endauth
+                                <a href="{{ route('public-profile.settings') }}" class="nav-link-sidebar flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('public-profile.*') ? 'nav-active' : '' }}">
+                                    <i class="fas fa-share-nodes w-5 text-center text-violet-400"></i>
+                                    <span>Public Profile</span>
+                                </a>
                                 <a href="{{ route('profile.edit') }}" class="nav-link-sidebar flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium">
                                     <i class="fas fa-cog w-5 text-center"></i>
                                     <span>Pengaturan</span>
