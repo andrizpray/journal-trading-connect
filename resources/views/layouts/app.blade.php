@@ -21,7 +21,7 @@
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=inter:wght@300;400;500;600;700;800;900&family=space+mono:wght@400;700&display=swap" rel="stylesheet" />
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -221,9 +221,273 @@
                 background: linear-gradient(135deg, #06b6d4, #0891b2);
                 color: white;
             }
+
+            /* ============================================
+               NEOBRUTALISM THEME
+               ============================================ */
+            .theme-neobrutalism {
+                --bg-primary: #FFF8F0;
+                --bg-secondary: #FFEFD5;
+                --bg-card: #FFFFFF;
+                --bg-sidebar: #FFF0DB;
+                --border-color: #1a1a2e;
+                --text-primary: #1a1a2e;
+                --text-secondary: #5a5a7a;
+                --accent-cyan: #FF6B35;
+                --accent-green: #2EC4B6;
+                --accent-red: #E71D36;
+                --accent-yellow: #FF9F1C;
+            }
+
+            .theme-neobrutalism {
+                font-family: 'Inter', sans-serif;
+                background-color: var(--bg-primary);
+                color: var(--text-primary);
+            }
+
+            /* Neo cards — thick border + hard shadow */
+            .theme-neobrutalism .card {
+                background-color: var(--bg-card);
+                border: 3px solid var(--border-color);
+                border-radius: 0;
+                box-shadow: 6px 6px 0px var(--border-color);
+            }
+
+            /* Neo buttons */
+            .theme-neobrutalism .btn-primary {
+                background: var(--accent-cyan);
+                color: white;
+                border: 3px solid var(--border-color);
+                border-radius: 0;
+                box-shadow: 4px 4px 0px var(--border-color);
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            .theme-neobrutalism .btn-primary:hover {
+                background: #ff8c5a;
+                box-shadow: 2px 2px 0px var(--border-color);
+                transform: translate(2px, 2px);
+            }
+            .theme-neobrutalism .btn-primary:active {
+                box-shadow: 0px 0px 0px var(--border-color);
+                transform: translate(4px, 4px);
+            }
+
+            .theme-neobrutalism .btn-secondary {
+                background: var(--bg-secondary);
+                border: 3px solid var(--border-color);
+                border-radius: 0;
+                box-shadow: 4px 4px 0px var(--border-color);
+                color: var(--text-primary);
+                font-weight: 700;
+            }
+            .theme-neobrutalism .btn-secondary:hover {
+                background: #ffd9b3;
+                box-shadow: 2px 2px 0px var(--border-color);
+                transform: translate(2px, 2px);
+            }
+
+            .theme-neobrutalism .btn-danger {
+                background: var(--accent-red);
+                color: white;
+                border: 3px solid var(--border-color);
+                border-radius: 0;
+                box-shadow: 4px 4px 0px var(--border-color);
+                font-weight: 700;
+            }
+            .theme-neobrutalism .btn-danger:hover {
+                background: #ff4d6a;
+                box-shadow: 2px 2px 0px var(--border-color);
+                transform: translate(2px, 2px);
+            }
+
+            /* Neo sidebar */
+            .theme-neobrutalism aside {
+                background-color: var(--bg-sidebar) !important;
+                border-right: 3px solid var(--border-color);
+            }
+
+            .theme-neobrutalism .nav-active {
+                background: var(--accent-cyan) !important;
+                border-right: none;
+                color: white !important;
+                font-weight: 800;
+                border: 3px solid var(--border-color);
+                border-radius: 0;
+                box-shadow: 4px 4px 0px var(--border-color);
+                margin: 2px 0;
+            }
+
+            .theme-neobrutalism .nav-link-sidebar {
+                color: var(--text-primary);
+                font-weight: 600;
+                border-radius: 0;
+            }
+            .theme-neobrutalism .nav-link-sidebar:hover {
+                background: rgba(255, 107, 53, 0.1);
+                border-radius: 0;
+            }
+
+            /* Neo inputs */
+            .theme-neobrutalism .dark-input {
+                background-color: white;
+                border: 3px solid var(--border-color);
+                color: var(--text-primary);
+                border-radius: 0;
+                padding: 0.6rem 0.75rem;
+                font-weight: 600;
+            }
+            .theme-neobrutalism .dark-input:focus {
+                border-color: var(--accent-cyan);
+                outline: none;
+                box-shadow: 4px 4px 0px rgba(255, 107, 53, 0.3);
+            }
+            .theme-neobrutalism .dark-input::placeholder {
+                color: #b0b0c0;
+                font-weight: 400;
+            }
+
+            /* Neo header */
+            .theme-neobrutalism header {
+                background-color: var(--bg-secondary) !important;
+                border-bottom: 3px solid var(--border-color) !important;
+            }
+            .theme-neobrutalism header h1 {
+                color: var(--text-primary) !important;
+                font-weight: 800;
+            }
+
+            /* Neo stat cards — colored tops */
+            .theme-neobrutalism .stat-card::before {
+                height: 6px;
+                border-radius: 0;
+            }
+            .theme-neobrutalism .stat-card-cyan::before { background: var(--accent-cyan); }
+            .theme-neobrutalism .stat-card-green::before { background: var(--accent-green); }
+            .theme-neobrutalism .stat-card-yellow::before { background: var(--accent-yellow); }
+            .theme-neobrutalism .stat-card-purple::before { background: #7B2FF7; }
+
+            /* Neo table rows */
+            .theme-neobrutalism .table-row-hover:hover {
+                background-color: rgba(255, 107, 53, 0.08);
+            }
+
+            /* Neo scrollbar */
+            .theme-neobrutalism ::-webkit-scrollbar-thumb {
+                background: var(--accent-cyan);
+                border-radius: 0;
+            }
+
+            /* Neo flash messages */
+            .theme-neobrutalism main > div:first-of-type[class*="bg-emerald"] {
+                background: #D4EDDA !important;
+                border: 3px solid var(--accent-green) !important;
+                color: #155724 !important;
+                font-weight: 700;
+                border-radius: 0;
+            }
+            .theme-neobrutalism main > div:first-of-type[class*="bg-red"] {
+                background: #F8D7DA !important;
+                border: 3px solid var(--accent-red) !important;
+                color: #721C24 !important;
+                font-weight: 700;
+                border-radius: 0;
+            }
+
+            /* Neo pagination */
+            .theme-neobrutalism .pagination-dark a {
+                color: var(--text-primary);
+                border: 2px solid var(--border-color);
+                border-radius: 0;
+                font-weight: 700;
+                margin: 0 2px;
+            }
+            .theme-neobrutalism .pagination-dark a:hover {
+                background: var(--accent-cyan);
+                color: white;
+            }
+            .theme-neobrutalism .pagination-dark .active a {
+                background: var(--accent-cyan);
+                color: white;
+                box-shadow: 3px 3px 0px var(--border-color);
+            }
+
+            /* Neo drop zone */
+            .theme-neobrutalism .drop-zone {
+                border: 4px dashed var(--border-color);
+                border-radius: 0;
+            }
+            .theme-neobrutalism .drop-zone:hover,
+            .theme-neobrutalism .drop-zone.active {
+                border-color: var(--accent-cyan);
+                background: rgba(255, 107, 53, 0.05);
+            }
+
+            /* Neo sidebar overlay */
+            .theme-neobrutalism .sidebar-overlay {
+                background: rgba(26, 26, 46, 0.4);
+            }
+
+            /* Neo password toggle */
+            .theme-neobrutalism .password-toggle-btn {
+                color: var(--text-secondary);
+            }
+            .theme-neobrutalism .password-toggle-btn:hover {
+                color: var(--accent-cyan);
+            }
+
+            /* Neo select dropdown */
+            .theme-neobrutalism select.dark-input {
+                appearance: none;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%231a1a2e' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+                background-repeat: no-repeat;
+                background-position: right 0.75rem center;
+                padding-right: 2rem;
+            }
+
+            /* Neo textarea */
+            .theme-neobrutalism textarea.dark-input {
+                resize: vertical;
+            }
+
+            /* Neo badge/tag styles */
+            .theme-neobrutalism [class*="bg-emerald-"][class*="text-emerald"] {
+                background: #D4EDDA !important;
+                color: #155724 !important;
+                border: 2px solid var(--accent-green);
+                border-radius: 0;
+                font-weight: 700;
+            }
+            .theme-neobrutalism [class*="bg-red-"][class*="text-red"] {
+                background: #F8D7DA !important;
+                color: #721C24 !important;
+                border: 2px solid var(--accent-red);
+                border-radius: 0;
+                font-weight: 700;
+            }
+            .theme-neobrutalism [class*="bg-yellow-"][class*="text-yellow"] {
+                background: #FFF3CD !important;
+                color: #856404 !important;
+                border: 2px solid var(--accent-yellow);
+                border-radius: 0;
+                font-weight: 700;
+            }
+
+            /* Neo user avatar */
+            .theme-neobrutalism .w-8.h-8.rounded-full,
+            .theme-neobrutalism .w-9.h-9.rounded-lg {
+                border-radius: 0 !important;
+                border: 3px solid var(--border-color);
+            }
+
+            /* Neo chart containers */
+            .theme-neobrutalism canvas {
+                border-radius: 0;
+            }
         </style>
     </head>
-    <body class="antialiased">
+    <body class="antialiased {{ auth()->check() ? 'theme-' . auth()->user()->theme : 'theme-dark' }}">
         <div x-data="{ sidebarOpen: false }" class="flex h-screen overflow-hidden">
 
             <!-- Mobile sidebar overlay -->
@@ -331,6 +595,19 @@
 
                     <!-- User section at bottom -->
                     <div class="p-3 border-t" style="border-color: var(--border-color);">
+                        {{-- Theme Switcher --}}
+                        <div class="px-3 py-2 mb-2">
+                            <span class="text-xs font-semibold uppercase tracking-wider" style="color: var(--text-secondary);">Theme</span>
+                        </div>
+                        <div class="flex gap-2 px-3 mb-3">
+                            <button onclick="switchTheme('dark')" class="theme-btn flex-1 flex items-center justify-center gap-2 px-2 py-2 text-xs font-bold border-2 transition-all {{ auth()->check() && auth()->user()->theme === 'dark' ? 'border-cyan-500 bg-gray-800 text-white' : 'border-gray-600 bg-gray-700/50 text-gray-400 hover:border-gray-400' }}" data-theme="dark">
+                                <i class="fas fa-moon"></i> Dark
+                            </button>
+                            <button onclick="switchTheme('neobrutalism')" class="theme-btn flex-1 flex items-center justify-center gap-2 px-2 py-2 text-xs font-bold border-2 transition-all {{ auth()->check() && auth()->user()->theme === 'neobrutalism' ? 'border-orange-500 bg-orange-100 text-orange-800' : 'border-gray-600 bg-gray-700/50 text-gray-400 hover:border-gray-400' }}" data-theme="neobrutalism">
+                                <i class="fas fa-palette"></i> Neo
+                            </button>
+                        </div>
+
                         <div class="flex items-center gap-3 px-3 py-2">
                             <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold text-white" style="background: linear-gradient(135deg, #06b6d4, #8b5cf6);">
                                 {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
@@ -445,6 +722,35 @@
                 toast.classList.add('translate-x-full', 'opacity-0');
                 setTimeout(() => toast.remove(), 300);
             }, 4000);
+        }
+        function switchTheme(theme) {
+            fetch('/theme', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({ theme: theme })
+            })
+            .then(r => r.json())
+            .then(data => {
+                document.body.className = 'antialiased theme-' + data.theme;
+                // Update button active states
+                document.querySelectorAll('.theme-btn').forEach(btn => {
+                    const t = btn.dataset.theme;
+                    if (t === data.theme) {
+                        btn.classList.remove('border-gray-600', 'bg-gray-700/50', 'text-gray-400');
+                        btn.classList.add(t === 'dark' ? 'border-cyan-500 bg-gray-800 text-white' : 'border-orange-500 bg-orange-100 text-orange-800');
+                    } else {
+                        btn.classList.remove('border-cyan-500', 'bg-gray-800', 'text-white', 'border-orange-500', 'bg-orange-100', 'text-orange-800');
+                        btn.classList.add('border-gray-600', 'bg-gray-700/50', 'text-gray-400');
+                    }
+                });
+                showToast('Theme switched to ' + (data.theme === 'neobrutalism' ? 'Neo' : 'Dark') + ' ✓', 'success');
+            })
+            .catch(err => {
+                console.error('Theme switch failed:', err);
+            });
         }
         </script>
     </body>

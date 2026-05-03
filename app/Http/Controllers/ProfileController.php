@@ -57,4 +57,21 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
+    /**
+     * Update user theme preference.
+     */
+    public function updateTheme(Request $request)
+    {
+        $allowed = ['dark', 'neobrutalism'];
+
+        $theme = $request->input('theme', 'dark');
+        if (!in_array($theme, $allowed)) {
+            $theme = 'dark';
+        }
+
+        $request->user()->update(['theme' => $theme]);
+
+        return response()->json(['theme' => $theme]);
+    }
 }
