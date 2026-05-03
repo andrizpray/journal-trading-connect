@@ -54,13 +54,13 @@
 ## 🔗 Phase 4 — Integrasi & Connect
 *Target: lebih dari sekadar CSV import*
 
-| # | Fitur | Deskripsi |
-|---|-------|-----------|
-| 4.1 | **MetaAPI.cloud integration** | Connect akun MT4/MT5 real-time via MetaAPI (read-only) |
-| 4.2 | **Auto-sync schedule** | Cron job sync otomatis setiap jam/hari dari MetaAPI |
-| 4.3 | **Multiple CSV format** | Support TradingView, cTrader, DXtrade CSV selain MT4/MT5 |
-| 4.4 | **Copy trade dari Jurnal Trading** | Import trade dari project jurnal-trading (port 80) via API |
-| 4.5 | **Webhook notification** | Notif ke Telegram saat trade import selesai, daily summary |
+| # | Fitur | Deskripsi | Status |
+|---|-------|-----------|--------|
+| 4.1 | **MetaAPI.cloud integration** | Connect akun MT4/MT5 real-time via MetaAPI (read-only) | ⏳ Dikembangkan nanti |
+| 4.2 | **Auto-sync schedule** | Cron job sync otomatis setiap jam/hari dari MetaAPI | ⏳ Dikembangkan nanti |
+| 4.3 | **Multiple CSV format** | Support TradingView, cTrader, DXtrade CSV selain MT4/MT5 | ✅ Selesai |
+| 4.4 | **Copy trade dari Jurnal Trading** | Import trade dari project jurnal-trading (port 80) via API | ✅ Selesai |
+| 4.5 | **Webhook notification** | Notif ke Telegram saat trade import selesai, daily summary | ⏳ Dikembangkan nanti |
 
 ---
 
@@ -70,9 +70,8 @@
 | # | Fitur | Deskripsi |
 |---|-------|-----------|
 | 5.1 | **Role system** | Admin (lihat semua) + User (hanya data sendiri) |
-| 5.2 | **Mentor mode** | User bisa share journal ke mentor, mentor bisa kasih komentar |
-| 5.3 | **Leaderboard** | Ranking win rate antar user (opt-in) |
-| 5.4 | **Public profile** | Share stats publik via link (pilih apa yang visible) |
+| 5.2 | **Leaderboard** | Ranking win rate antar user (opt-in) |
+| 5.3 | **Public profile** | Share stats publik via link (pilih apa yang visible) |
 
 ---
 
