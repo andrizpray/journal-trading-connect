@@ -174,6 +174,20 @@ function handleImportSubmit(btn) {
     btn.classList.add('opacity-70', 'cursor-not-allowed');
     icon.className = 'fas fa-spinner fa-spin';
     text.textContent = 'Mengimport...';
+
+    // Reset jika server error (no redirect = error)
+    setTimeout(function() {
+        if (btn.disabled) {
+            btn.disabled = false;
+            btn.classList.remove('opacity-70', 'cursor-not-allowed');
+            icon.className = 'fas fa-exclamation-triangle text-red-400';
+            text.textContent = 'Gagal! Coba lagi.';
+            setTimeout(function() {
+                icon.className = 'fas fa-upload';
+                text.textContent = 'Import Sekarang';
+            }, 3000);
+        }
+    }, 60000);
 }
 </script>
 @endsection
