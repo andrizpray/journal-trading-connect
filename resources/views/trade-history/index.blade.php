@@ -102,8 +102,7 @@
                             <td class="py-2.5 text-right font-mono text-white">{{ $trade->open_price ? number_format($trade->open_price, 5) : '-' }}</td>
                             <td class="py-2.5 text-right font-mono text-white">{{ $trade->close_price ? number_format($trade->close_price, 5) : '-' }}</td>
                             <td class="py-2.5 text-right font-bold {{ $trade->profit_loss >= 0 ? 'text-emerald-400' : 'text-red-400' }}">
-                                {{ $trade->profit_loss >= 0 ? '+' : '' }}{{ number_format($trade->profit_loss, 2, ',', '.') }}
-                                <span class="text-[9px] font-normal opacity-60 ml-0.5">{{ $trade->tradingAccount?->currency ?? 'USD' }}</span>
+                                {{ $trade->profit_loss >= 0 ? '+' : '' }}{{ currency_symbol($trade->tradingAccount?->currency) }}{{ number_format($trade->profit_loss, 2, ',', '.') }}
                             </td>
                             <td class="py-2.5 text-center">
                                 @if($trade->result === 'win')

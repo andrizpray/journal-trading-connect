@@ -99,7 +99,7 @@
                     {{ $account->platform }}
                 </span>
                 <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gray-700/50 text-gray-300">
-                    {{ $account->currency }}
+                    {{ currency_symbol($account->currency) }}
                 </span>
             </div>
 
@@ -117,8 +117,7 @@
                 <div>
                     <div class="text-[10px] uppercase" style="color: var(--text-secondary);">Total P&L</div>
                     <div class="text-sm font-bold {{ $account->total_pnl >= 0 ? 'text-emerald-400' : 'text-red-400' }}">
-                        {{ $account->total_pnl >= 0 ? '+' : '' }}{{ number_format($account->total_pnl, 0, ',', '.') }}
-                        <span class="text-[9px] font-normal opacity-60">{{ $account->currency }}</span>
+                        {{ $account->total_pnl >= 0 ? '+' : '' }}{{ currency_symbol($account->currency) }}{{ number_format($account->total_pnl, 0, ',', '.') }}
                     </div>
                 </div>
             </div>

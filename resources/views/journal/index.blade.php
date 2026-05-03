@@ -126,8 +126,7 @@
                     </div>
 
                     <div class="font-bold mt-1 {{ $entry->profit_loss >= 0 ? 'text-emerald-400' : 'text-red-400' }}">
-                        {{ $entry->profit_loss >= 0 ? '+' : '' }}{{ number_format($entry->profit_loss, 2, ',', '.') }}
-                        <span class="text-[9px] font-normal opacity-60">{{ $entry->tradeHistory?->tradingAccount?->currency ?? 'USD' }}</span>
+                        {{ $entry->profit_loss >= 0 ? '+' : '' }}{{ currency_symbol($entry->tradeHistory?->tradingAccount?->currency) }}{{ number_format($entry->profit_loss, 2, ',', '.') }}
                     </div>
 
                     @if($entry->strategy_used)

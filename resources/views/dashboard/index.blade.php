@@ -105,12 +105,10 @@
                             </td>
                             <td class="py-2.5 text-right text-white">{{ number_format($trade->lot_size, 2) }}</td>
                             <td class="py-2.5 text-right font-bold whitespace-nowrap {{ $trade->profit_loss >= 0 ? 'text-emerald-400' : 'text-red-400' }}">
-                                {{ $trade->profit_loss >= 0 ? '+' : '' }}{{ number_format($trade->profit_loss, 2, ',', '.') }}
-                                <span class="text-[9px] font-normal opacity-60 ml-0.5">{{ $trade->tradingAccount?->currency ?? 'USD' }}</span>
+                                {{ $trade->profit_loss >= 0 ? '+' : '' }}{{ currency_symbol($trade->tradingAccount?->currency) }}{{ number_format($trade->profit_loss, 2, ',', '.') }}
                             </td>
                             <td class="hidden sm:table-cell py-2.5" style="color: var(--text-secondary);">
                                 {{ $trade->tradingAccount?->broker ?? '-' }}
-                                <span class="text-[9px] opacity-60">({{ $trade->tradingAccount?->currency ?? 'USD' }})</span>
                             </td>
                         </tr>
                         @endforeach
