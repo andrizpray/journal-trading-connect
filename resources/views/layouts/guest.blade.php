@@ -21,6 +21,15 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+        <!-- Service Worker -->
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('/sw.js').catch(function() {});
+                });
+            }
+        </script>
+
         <style>
             body {
                 font-family: 'Inter', sans-serif;
