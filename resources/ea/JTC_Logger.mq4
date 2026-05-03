@@ -9,7 +9,6 @@
 #property strict
 #property indicator_chart_window
 #property indicator_buffers 0
-#property indicator_plots   0
 
 //--- Input parameters (user isi setelah install)
 input string InpServerUrl    = "http://43.134.37.14:8081"; // Server URL
@@ -87,6 +86,23 @@ void OnDeinit(const int reason)
 
    Print("[JTC] Logger stopped. Reason: ", reasonText);
    Comment("");
+}
+
+//+------------------------------------------------------------------+
+//| OnCalculate - required for custom indicators                    |
+//+------------------------------------------------------------------+
+int OnCalculate(const int rates_total,
+                const int prev_calculated,
+                const datetime &time[],
+                const double &open[],
+                const double &high[],
+                const double &low[],
+                const double &close[],
+                const long &tick_volume[],
+                const long &volume[],
+                const int &spread[])
+{
+   return(rates_total);
 }
 
 //+------------------------------------------------------------------+
@@ -249,16 +265,20 @@ void SendTradeHistory()
 string SendRequest(string endpoint, string jsonBody)
 {
    string url = InpServerUrl + endpoint;
-   string headers = "";
-   string result = "";
-   string cookie = "";
+   string headers = "Content-Type: application/json\r\n";
+   headers += "Authorization: Bearer " + InpApiToken;
    int timeout = 5000; // 5 detik
 
-   // Bangun headers
-   headers = "Content-Type: application/json\r\n";
-   headers += "Authorization: Bearer " + InpApiToken;
+   // MQL4 WebRequest requires uchar arrays for data in/out
+   uchar dataOut[];
+   uchar dataIn[];
+   string responseHeaders = "";
 
-   int res = WebRequest("POST", url, headers, timeout, jsonBody, result, cookie);
+   StringToCharArray(jsonBody, dataOut, 0, StringLen(jsonBody));
+
+   int res = WebRequest("POST", url, headers, timeout, dataOut, dataIn, responseHeaders);
+
+   string result = CharArrayToString(dataIn);
 
    if(res == -1)
    {
@@ -321,10 +341,10 @@ void SendHeartbeat()
 //+------------------------------------------------------------------+
 void SaveLogToFile(string text)
 {
-   int handle = FileOpen("jtc_log.txt", FILE_READ|FILE_WRITE|FILE_SHARE_READ);
+   int handle = FileOpen("jtc_log.txt", FILE_READ|FILE_WRITE|FILE_SHARE_READ|FILE_TXT);
    if(handle == INVALID_HANDLE)
    {
-      handle = FileOpen("jtc_log.txt", FILE_WRITE|FILE_SHARE_READ);
+      handle = FileOpen("jtc_log.txt", FILE_WRITE|FILE_SHARE_READ|FILE_TXT);
       if(handle == INVALID_HANDLE)
       {
          if(InpDebugMode) Print("[JTC] Cannot create log file");
@@ -345,10 +365,10 @@ void SaveLogToFile(string text)
 //+------------------------------------------------------------------+
 void SaveOfflineTrades(string jsonBody)
 {
-   int handle = FileOpen("jtc_offline_buffer.txt", FILE_READ|FILE_WRITE|FILE_SHARE_READ);
+   int handle = FileOpen("jtc_offline_buffer.txt", FILE_READ|FILE_WRITE|FILE_SHARE_READ|FILE_TXT);
    if(handle == INVALID_HANDLE)
    {
-      handle = FileOpen("jtc_offline_buffer.txt", FILE_WRITE|FILE_SHARE_READ);
+      handle = FileOpen("jtc_offline_buffer.txt", FILE_WRITE|FILE_SHARE_READ|FILE_TXT);
       if(handle == INVALID_HANDLE)
       {
          if(InpDebugMode) Print("[JTC] Cannot create offline buffer file");
