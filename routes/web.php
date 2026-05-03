@@ -21,7 +21,9 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])->name('dashboard');
 
 // Public profile (no auth required)
-Route::get('/u/{slug}', [PublicProfileController::class, 'show'])->name('public-profile.show');
+Route::get('/u/{slug}', [PublicProfileController::class, 'show'])
+    ->middleware('throttle:60,1')
+    ->name('public-profile.show');
 
 Route::middleware('auth')->group(function () {
     // Profile
@@ -37,7 +39,7 @@ Route::middleware('auth')->group(function () {
 
     // Trade History
     Route::get('/trade-history', [TradeHistoryController::class, 'index'])->name('trade-history.index');
-    Route::get('/trade-history/export', [TradeHistoryController::class, 'export'])->name('trade-history.export');
+    Route::get('/trade-history/export', [TradeHistoryController::class, 'export'])->name('trade-history.export')->middleware('throttle:20,1');
     Route::get('/trade-history/{id}/edit', [TradeHistoryController::class, 'edit'])->name('trade-history.edit');
     Route::put('/trade-history/{id}', [TradeHistoryController::class, 'update'])->name('trade-history.update');
     Route::delete('/trade-history/{id}', [TradeHistoryController::class, 'destroy'])->name('trade-history.destroy');
@@ -54,7 +56,7 @@ Route::middleware('auth')->group(function () {
 
     // CSV Import
     Route::get('/import', [ImportController::class, 'index'])->name('import.index');
-    Route::post('/import', [ImportController::class, 'import'])->name('import.upload');
+    Route::post('/import', [ImportController::class, 'import'])->name('import.upload')->middleware('throttle:10,1');
     Route::get('/import/logs', [ImportController::class, 'logs'])->name('import.logs');
     Route::get('/import/template', [ImportController::class, 'template'])->name('import.template');
 

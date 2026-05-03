@@ -8,6 +8,14 @@
 
         <title>{{ config('app.name', 'Journal Trading Connect') }}</title>
 
+        <!-- PWA -->
+        <link rel="manifest" href="/manifest.json">
+        <meta name="theme-color" content="#06b6d4">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-title" content="JTC">
+        <link rel="apple-touch-icon" href="/pwa-icons/icon-192.png">
+
         <!-- Font Awesome 6.4 -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
