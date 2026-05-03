@@ -149,9 +149,10 @@ class ConnectController extends Controller
             ->findOrFail($request->account_id);
 
         try {
-            $response = Http::post(config('app.url') . '/api/ea/heartbeat', [], [
+            $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $account->api_token,
-            ]);
+                'Accept' => 'application/json',
+            ])->post(config('app.url') . '/api/ea/heartbeat');
 
             if ($response->successful()) {
                 return back()->with('success', 'Koneksi berhasil! Server merespon: ' . $response->body());
