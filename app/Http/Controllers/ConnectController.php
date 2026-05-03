@@ -7,6 +7,7 @@ use App\Models\TradingAccount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class ConnectController extends Controller
 {
@@ -102,5 +103,63 @@ class ConnectController extends Controller
         }
 
         return view('connect.index', compact('accounts', 'journalConnected', 'journalCount'));
+    }
+
+    /**
+     * EA Logger setup page
+     */
+    public function eaLoggerSetup(Request $request)
+    {
+        $accounts = TradingAccount::where('user_id', Auth::id())
+            ->orderBy('broker')
+            ->get();
+
+        $selectedId = $request->get('account_id', $accounts->first()?->id);
+
+        $selectedAccount = $selectedId
+            ? TradingAccount::where('user_id', Auth::id())->findOrFail($selectedId)
+            : null;
+
+        return view('connect.ea-logger-setup', compact('accounts', 'selectedAccount', 'selectedId'));
+    }
+
+    /**
+     * Regenerate API token for EA Logger
+     */
+    public function regenerateToken(Request $request, $id)
+    {
+        $account = TradingAccount::where('user_id', Auth::id())->findOrFail($id);
+        $newToken = $account->regenerateToken();
+
+        return back()->with('success', 'Token berhasil diperbarui.')
+            ->with('new_token', $newToken)
+            ->with('regenerated_account_id', $id);
+    }
+
+    /**
+     * Test EA connection (heartbeat test)
+     */
+    public function testConnection(Request $request)
+    {
+        $request->validate([
+            'account_id' => 'required|exists:trading_accounts,id',
+        ]);
+
+        $account = TradingAccount::where('user_id', Auth::id())
+            ->findOrFail($request->account_id);
+
+        try {
+            $response = Http::post(config('app.url') . '/api/ea/heartbeat', [], [
+                'Authorization' => 'Bearer ' . $account->api_token,
+            ]);
+
+            if ($response->successful()) {
+                return back()->with('success', 'Koneksi berhasil! Server merespon: ' . $response->body());
+            }
+
+            return back()->with('error', 'Gagal: HTTP ' . $response->status());
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal koneksi ke server: ' . $e->getMessage());
+        }
     }
 }

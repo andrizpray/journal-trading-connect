@@ -75,6 +75,9 @@ Route::middleware('auth')->group(function () {
     // Connect
     Route::get('/connect', [ConnectController::class, 'index'])->name('connect.index');
     Route::post('/connect/jurnal-trading', [ConnectController::class, 'importFromJurnalTrading'])->name('connect.import-jurnal');
+    Route::get('/connect/ea-logger', [ConnectController::class, 'eaLoggerSetup'])->name('connect.ea-logger');
+    Route::post('/connect/ea-logger/token/{id}', [ConnectController::class, 'regenerateToken'])->name('connect.ea-logger.regenerate-token');
+    Route::post('/connect/ea-logger/test', [ConnectController::class, 'testConnection'])->name('connect.ea-logger.test');
 
     // Admin (only accessible by admin users)
     Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {

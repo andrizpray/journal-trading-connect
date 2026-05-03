@@ -83,24 +83,23 @@
         @endif
     </div>
 
-    {{-- 4.1 — MetaAPI (Coming Soon) --}}
-    <div class="card p-5 sm:p-6 opacity-70">
+    {{-- EA Logger --}}
+    <div class="card p-5 sm:p-6">
         <div class="flex items-center gap-3 mb-4">
-            <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
-                <i class="fas fa-plug text-white text-sm"></i>
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background: linear-gradient(135deg, #10b981, #059669);">
+                <i class="fas fa-robot text-white text-sm"></i>
             </div>
             <div>
-                <h3 class="font-semibold text-white">MetaAPI <span class="text-[10px] px-2 py-0.5 rounded-full bg-yellow-900/30 text-yellow-400 ml-1">Soon</span></h3>
-                <p class="text-[10px]" style="color: var(--text-secondary);">Real-time MT4/MT5 sync</p>
+                <h3 class="font-semibold text-white">EA Logger</h3>
+                <p class="text-[10px]" style="color: var(--text-secondary);">Auto-sync dari MT4/MT5</p>
             </div>
         </div>
         <p class="text-xs mb-3" style="color: var(--text-secondary);">
-            Hubungkan akun MT4/MT5 via MetaAPI untuk auto-sync trade secara real-time (read-only).
+            Install EA Logger di terminal MT4/MT5. Trade otomatis tersinkronisasi setiap 30 detik. 100% gratis.
         </p>
-        <div class="text-xs p-3 rounded-lg" style="background-color: var(--bg-secondary); color: var(--text-secondary);">
-            <i class="fas fa-info-circle mr-1 text-yellow-400"></i>
-            Memerlukan API key MetaAPI.cloud (berbayar). Hubungi developer untuk setup.
-        </div>
+        <a href="{{ route('connect.ea-logger') }}" class="btn-primary flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg text-sm font-medium">
+            <i class="fas fa-cog"></i>Setup EA Logger
+        </a>
     </div>
 
     {{-- 4.5 — Telegram Notif (Coming Soon) --}}
