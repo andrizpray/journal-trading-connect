@@ -39,6 +39,8 @@ Route::middleware('auth')->group(function () {
 
     // Trade History
     Route::get('/trade-history', [TradeHistoryController::class, 'index'])->name('trade-history.index');
+    Route::get('/trade-history/create', [TradeHistoryController::class, 'create'])->name('trade-history.create');
+    Route::post('/trade-history', [TradeHistoryController::class, 'store'])->name('trade-history.store');
     Route::get('/trade-history/export', [TradeHistoryController::class, 'export'])->name('trade-history.export')->middleware('throttle:20,1');
     Route::get('/trade-history/{id}/edit', [TradeHistoryController::class, 'edit'])->name('trade-history.edit');
     Route::put('/trade-history/{id}', [TradeHistoryController::class, 'update'])->name('trade-history.update');

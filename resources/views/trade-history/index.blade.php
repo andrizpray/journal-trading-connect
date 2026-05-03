@@ -10,8 +10,11 @@
         <p class="text-sm mt-1" style="color: var(--text-secondary);">{{ $trades->total() }} trade ditemukan</p>
     </div>
     <div class="flex gap-2 shrink-0">
-        <a href="{{ route('import.index') }}" class="btn-primary flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium">
-            <i class="fas fa-file-import"></i>Import
+        <a href="{{ route('trade-history.create') }}" class="btn-primary flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium">
+            <i class="fas fa-plus"></i>Tambah
+        </a>
+        <a href="{{ route('import.index') }}" class="btn-secondary flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium">
+            <i class="fas fa-file-import"></i><span class="hidden sm:inline">Import</span>
         </a>
         <a href="{{ route('trade-history.export', request()->query()) }}" class="btn-secondary flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium">
             <i class="fas fa-file-export"></i>Export

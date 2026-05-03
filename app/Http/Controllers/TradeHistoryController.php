@@ -6,6 +6,7 @@ use App\Models\TradeHistory;
 use App\Exports\TradeHistoryExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Carbon;
 
 class TradeHistoryController extends Controller
 {
@@ -73,6 +74,49 @@ class TradeHistoryController extends Controller
         $accounts = Auth::user()->tradingAccounts()->orderBy('broker')->get();
 
         return view('trade-history.edit', compact('trade', 'accounts'));
+    }
+
+    public function create()
+    {
+        $accounts = Auth::user()->tradingAccounts()->orderBy('broker')->get();
+
+        return view('trade-history.create', compact('accounts'));
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'trading_account_id' => 'required|exists:trading_accounts,id',
+            'currency_pair' => 'required|string|max:20',
+            'trade_type' => 'required|in:buy,sell,buy_limit,sell_limit,buy_stop,sell_stop',
+            'lot_size' => 'required|numeric|min:0.01',
+            'open_price' => 'nullable|numeric',
+            'close_price' => 'nullable|numeric',
+            'stop_loss' => 'nullable|numeric',
+            'take_profit' => 'nullable|numeric',
+            'swap' => 'nullable|numeric',
+            'commission' => 'nullable|numeric',
+            'profit_loss' => 'required|numeric',
+            'open_date' => 'nullable|date',
+            'close_date' => 'nullable|date',
+            'comment' => 'nullable|string|max:500',
+        ]);
+
+        $validated['user_id'] = Auth::id();
+        $validated['ticket'] = 'MANUAL-' . now()->format('YmdHis') . '-' . rand(100, 999);
+        $validated['result'] = $validated['profit_loss'] > 0 ? 'win'
+            : ($validated['profit_loss'] < 0 ? 'loss' : 'break_even');
+
+        // Auto-calculate duration
+        if (!empty($validated['open_date']) && !empty($validated['close_date'])) {
+            $validated['duration_minutes'] = (int) Carbon::parse($validated['close_date'])
+                ->diffInMinutes(Carbon::parse($validated['open_date']));
+        }
+
+        TradeHistory::create($validated);
+
+        return redirect()->route('trade-history.index')
+            ->with('success', 'Trade berhasil ditambahkan.');
     }
 
     public function update(Request $request, $id)
