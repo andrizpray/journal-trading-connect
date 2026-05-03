@@ -25,6 +25,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
             'leaderboard_opt_in' => 'boolean',
             'public_profile_enabled' => 'boolean',
+            'public_visible_fields' => 'array',
         ];
     }
 
