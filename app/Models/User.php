@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'role', 'leaderboard_opt_in', 'public_slug', 'public_profile_enabled', 'public_visible_fields'])]
+#[Fillable(['name', 'email', 'password', 'role', 'leaderboard_opt_in', 'public_slug', 'public_profile_enabled', 'public_visible_fields', 'notify_daily_journal', 'notify_weekly_review', 'notify_trade_result', 'daily_journal_time', 'weekly_review_day'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -26,6 +26,9 @@ class User extends Authenticatable implements MustVerifyEmail
             'leaderboard_opt_in' => 'boolean',
             'public_profile_enabled' => 'boolean',
             'public_visible_fields' => 'array',
+            'notify_daily_journal' => 'boolean',
+            'notify_weekly_review' => 'boolean',
+            'notify_trade_result' => 'boolean',
         ];
     }
 
@@ -59,5 +62,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function journalEntries()
     {
         return $this->hasMany(JournalEntry::class);
+    }
+
+    public function pushSubscriptions()
+    {
+        return $this->hasMany(PushSubscription::class);
     }
 }

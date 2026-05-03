@@ -10,6 +10,7 @@ use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\ConnectController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LeaderboardController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PublicProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -89,6 +90,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/users/{id}', [AdminController::class, 'viewUser'])->name('user-detail');
         Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('delete-user');
     });
+
+    // Notifications
+    Route::get('/notifications/settings', [NotificationController::class, 'settings'])->name('notifications.settings');
+    Route::post('/notifications/settings', [NotificationController::class, 'updateSettings'])->name('notifications.update');
+    Route::post('/notifications/subscribe', [NotificationController::class, 'subscribe'])->name('notifications.subscribe');
+    Route::post('/notifications/unsubscribe', [NotificationController::class, 'unsubscribe'])->name('notifications.unsubscribe');
 });
 
 require __DIR__.'/auth.php';
