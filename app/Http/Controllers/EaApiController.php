@@ -10,6 +10,24 @@ use Illuminate\Support\Carbon;
 class EaApiController extends Controller
 {
     /**
+     * Ping — cek koneksi & validasi token.
+     * GET /api/ea/ping
+     */
+    public function ping(Request $request)
+    {
+        $account = $request->attributes->get('ea_account');
+
+        return response()->json([
+            'status'         => 'ok',
+            'message'        => 'Connection successful',
+            'account_number' => $account->account_number,
+            'broker'         => $account->broker,
+            'platform'       => $account->platform,
+            'server_time'    => now()->toDateTimeString(),
+        ]);
+    }
+
+    /**
      * Simpan satu trade dari EA.
      * POST /api/ea/trade
      */

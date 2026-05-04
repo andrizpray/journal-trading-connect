@@ -192,7 +192,7 @@ class ConnectController extends Controller
                 'Accept' => 'application/json',
             ])->withoutVerifying()
               ->timeout(10)
-              ->post($serverUrl . '/api/ea/heartbeat');
+              ->get($serverUrl . '/api/ea/ping');
 
             if ($response->successful()) {
                 $apiOk = true;

@@ -116,10 +116,8 @@
             Token ini digunakan oleh EA Logger untuk autentikasi. Jangan bagikan token ke orang lain.
         </p>
         <div class="flex items-center gap-2">
-            <div class="flex-1 p-2 rounded-lg bg-gray-900 font-mono text-xs break-all select-all text-cyan-400" id="tokenDisplay">
-                {{ $selectedAccount->api_token }}
-            </div>
-            <button onclick="copyToken()" class="px-3 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-medium transition" title="Copy token">
+            <div class="flex-1 p-2 rounded-lg bg-gray-900 font-mono text-xs break-all select-all text-cyan-400" id="tokenDisplay" data-token="{{ $selectedAccount->api_token ?? '' }}">{{ $selectedAccount->api_token ?? '' }}</div>
+            <button onclick="copyToken(event)" class="px-3 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-medium transition" title="Copy token">
                 <i class="fas fa-copy"></i>
             </button>
         </div>
@@ -246,9 +244,9 @@
 
 @push('scripts')
 <script>
-function copyToken() {
+function copyToken(event) {
     const tokenEl = document.getElementById('tokenDisplay');
-    const text = tokenEl.textContent.trim();
+    const text = tokenEl.getAttribute('data-token');
     navigator.clipboard.writeText(text).then(() => {
         const btn = event.target.closest('button');
         const orig = btn.innerHTML;
@@ -260,6 +258,15 @@ function copyToken() {
             btn.classList.remove('bg-emerald-600');
             btn.classList.add('bg-cyan-600');
         }, 2000);
+    }).catch(() => {
+        // Fallback: select text in div
+        const range = document.createRange();
+        range.selectNodeContents(tokenEl);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        document.execCommand('copy');
+        sel.removeAllRanges();
     });
 }
 
