@@ -11,7 +11,7 @@
 #property indicator_buffers 0
 
 //--- Input parameters (user isi setelah install)
-input string InpServerUrl    = "http://43.134.37.14:8081"; // Server URL
+input string InpServerUrl    = "https://eatrade-journal.site"; // Server URL
 input string InpApiToken     = "";                         // API Token (dari halaman Connect)
 input int    InpIntervalSec  = 30;    // Kirim data tiap X detik
 input int    InpMaxTrades    = 50;    // Maks trade per request

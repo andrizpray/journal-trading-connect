@@ -82,6 +82,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/connect/ea-logger', [ConnectController::class, 'eaLoggerSetup'])->name('connect.ea-logger');
     Route::post('/connect/ea-logger/token/{id}', [ConnectController::class, 'regenerateToken'])->name('connect.ea-logger.regenerate-token');
     Route::post('/connect/ea-logger/test', [ConnectController::class, 'testConnection'])->name('connect.ea-logger.test');
+    Route::post('/connect/ea-logger/test-ajax', [ConnectController::class, 'testConnectionAjax'])->name('connect.ea-logger.test-ajax');
 
     // Admin (only accessible by admin users)
     Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {

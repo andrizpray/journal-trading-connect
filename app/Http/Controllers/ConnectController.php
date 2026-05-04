@@ -137,7 +137,7 @@ class ConnectController extends Controller
     }
 
     /**
-     * Test EA connection (heartbeat test)
+     * Test EA connection (heartbeat test) — legacy full-page reload
      */
     public function testConnection(Request $request)
     {
@@ -148,19 +148,88 @@ class ConnectController extends Controller
         $account = TradingAccount::where('user_id', Auth::id())
             ->findOrFail($request->account_id);
 
+        $result = $this->performConnectionTest($account);
+
+        return back()->with($result['type'], $result['message']);
+    }
+
+    /**
+     * Test EA connection via AJAX — returns JSON
+     */
+    public function testConnectionAjax(Request $request)
+    {
+        $request->validate([
+            'account_id' => 'required|exists:trading_accounts,id',
+        ]);
+
+        $account = TradingAccount::where('user_id', Auth::id())
+            ->findOrFail($request->account_id);
+
+        $result = $this->performConnectionTest($account);
+
+        return response()->json($result);
+    }
+
+    /**
+     * Perform the actual heartbeat connection test
+     */
+    private function performConnectionTest(TradingAccount $account): array
+    {
+        $serverUrl = config('app.url');
+
         try {
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $account->api_token,
                 'Accept' => 'application/json',
-            ])->post(config('app.url') . '/api/ea/heartbeat');
+            ])->withoutVerifying()
+              ->timeout(10)
+              ->post($serverUrl . '/api/ea/heartbeat');
 
             if ($response->successful()) {
-                return back()->with('success', 'Koneksi berhasil! Server merespon: ' . $response->body());
+                $data = $response->json();
+                $serverTime = $data['server_time'] ?? '-';
+                $pendingTrades = $data['pending_trades'] ?? 0;
+
+                return [
+                    'type' => 'success',
+                    'message' => 'Koneksi berhasil!',
+                    'details' => [
+                        'server_time' => $serverTime,
+                        'total_trades' => $pendingTrades,
+                        'server_url' => $serverUrl,
+                    ],
+                ];
             }
 
-            return back()->with('error', 'Gagal: HTTP ' . $response->status());
+            $status = $response->status();
+            $body = $response->body();
+            $hint = '';
+
+            if ($status === 401) {
+                $hint = 'Token tidak valid. Coba generate token baru.';
+            } elseif ($status === 419) {
+                $hint = 'CSRF token expired. Refresh halaman dan coba lagi.';
+            } elseif ($status >= 500) {
+                $hint = 'Server error. Coba lagi nanti.';
+            }
+
+            return [
+                'type' => 'error',
+                'message' => "Gagal terhubung (HTTP {$status})",
+                'hint' => $hint,
+            ];
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            return [
+                'type' => 'error',
+                'message' => 'Tidak bisa terhubung ke server',
+                'hint' => 'Pastikan server berjalan dan URL benar. URL saat ini: ' . $serverUrl,
+            ];
         } catch (\Exception $e) {
-            return back()->with('error', 'Gagal koneksi ke server: ' . $e->getMessage());
+            return [
+                'type' => 'error',
+                'message' => 'Gagal koneksi: ' . $e->getMessage(),
+                'hint' => 'Cek konfigurasi server dan coba lagi.',
+            ];
         }
     }
 }

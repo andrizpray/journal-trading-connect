@@ -14,23 +14,6 @@
     <p class="text-sm mt-1" style="color: var(--text-secondary);">Setup EA Logger untuk auto-sync trade dari MT4/MT5</p>
 </div>
 
-{{-- Flash messages --}}
-@if(session('success'))
-    <div class="mb-4 p-3 rounded-lg bg-emerald-900/30 border border-emerald-700/30 text-emerald-400 text-sm">
-        <i class="fas fa-check-circle mr-1"></i>{{ session('success') }}
-        @if(session('new_token'))
-            <div class="mt-2 p-2 rounded bg-gray-900/50 text-xs font-mono break-all select-all">
-                {{ session('new_token') }}
-            </div>
-        @endif
-    </div>
-@endif
-@if(session('error'))
-    <div class="mb-4 p-3 rounded-lg bg-red-900/30 border border-red-700/30 text-red-400 text-sm">
-        <i class="fas fa-exclamation-circle mr-1"></i>{{ session('error') }}
-    </div>
-@endif
-
 @if($accounts->isEmpty())
     <div class="card p-6 text-center">
         <i class="fas fa-exclamation-triangle text-3xl text-yellow-400 mb-3"></i>
@@ -62,8 +45,37 @@
         </form>
 
         @if($selectedAccount)
-            {{-- Akun info --}}
+            {{-- Akun info dengan connection status --}}
             <div class="p-3 rounded-lg text-xs" style="background-color: var(--bg-secondary);">
+                {{-- Connection Status Banner --}}
+                <div class="flex items-center gap-2 mb-3 pb-2 border-b" style="border-color: var(--border-color);">
+                    @php
+                        $isConnected = $selectedAccount->last_synced_at && $selectedAccount->last_synced_at->gt(now()->subMinutes(10));
+                    @endphp
+                    @if($isConnected)
+                        <span class="flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <span class="text-emerald-400 font-medium">EA Terhubung</span>
+                        </span>
+                        <span class="text-[10px]" style="color: var(--text-secondary);">
+                            Terakhir aktif {{ $selectedAccount->last_synced_at->diffForHumans() }}
+                        </span>
+                    @elseif($selectedAccount->last_synced_at)
+                        <span class="flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-yellow-400"></span>
+                            <span class="text-yellow-400 font-medium">EA Tidak Aktif</span>
+                        </span>
+                        <span class="text-[10px]" style="color: var(--text-secondary);">
+                            Terakhir sync {{ $selectedAccount->last_synced_at->diffForHumans() }}
+                        </span>
+                    @else
+                        <span class="flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-gray-500"></span>
+                            <span class="text-gray-400 font-medium">Belum Pernah Terhubung</span>
+                        </span>
+                    @endif
+                </div>
+                
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     <div>
                         <span style="color: var(--text-secondary);">Broker:</span>
@@ -77,12 +89,6 @@
                         <span style="color: var(--text-secondary);">Platform:</span>
                         <span class="text-white ml-1 uppercase">{{ $selectedAccount->platform ?? '-' }}</span>
                     </div>
-                    @if($selectedAccount->last_synced_at)
-                    <div>
-                        <span style="color: var(--text-secondary);">Last Sync:</span>
-                        <span class="text-emerald-400 ml-1">{{ $selectedAccount->last_synced_at->diffForHumans() }}</span>
-                    </div>
-                    @endif
                     <div>
                         <span style="color: var(--text-secondary);">Total Trades:</span>
                         <span class="text-white ml-1">{{ $selectedAccount->total_trades ?? 0 }}</span>
@@ -203,7 +209,7 @@
                     <li>1. Klik <strong class="text-white">Tools → Options</strong></li>
                     <li>2. Tab <strong class="text-white">Expert Advisors</strong></li>
                     <li>3. Centang <strong class="text-white">"Allow WebRequest for listed URL"</strong></li>
-                    <li>4. Klik tombol <strong class="text-white">+</strong> lalu tambahkan: <code class="px-1 py-0.5 rounded bg-gray-800 text-cyan-400">http://43.134.37.14:8081</code></li>
+                    <li>4. Klik tombol <strong class="text-white">+</strong> lalu tambahkan: <code class="px-1 py-0.5 rounded bg-gray-800 text-cyan-400">https://eatrade-journal.site</code></li>
                     <li>5. Klik <strong class="text-white">OK</strong></li>
                 </ol>
             </div>
@@ -219,13 +225,17 @@
         <p class="text-xs mb-3" style="color: var(--text-secondary);">
             Kirim heartbeat test untuk memastikan EA Logger bisa terhubung ke server.
         </p>
-        <form method="POST" action="{{ route('connect.ea-logger.test') }}">
-            @csrf
-            <input type="hidden" name="account_id" value="{{ $selectedAccount->id }}">
-            <button type="submit" class="btn-primary flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium">
-                <i class="fas fa-satellite-dish"></i>Test Koneksi
-            </button>
-        </form>
+        
+        {{-- Test Result Area --}}
+        <div id="testResult" class="hidden mb-4">
+            {{-- Will be populated by JS --}}
+        </div>
+
+        <button type="button" id="testConnectionBtn" onclick="testConnection({{ $selectedAccount->id }})" 
+            class="btn-primary flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium">
+            <i class="fas fa-satellite-dish"></i>
+            <span id="testBtnText">Test Koneksi</span>
+        </button>
     </div>
 
     @endif
@@ -250,6 +260,97 @@ function copyToken() {
             btn.classList.remove('bg-emerald-600');
             btn.classList.add('bg-cyan-600');
         }, 2000);
+    });
+}
+
+function testConnection(accountId) {
+    const btn = document.getElementById('testConnectionBtn');
+    const btnText = document.getElementById('testBtnText');
+    const resultDiv = document.getElementById('testResult');
+    
+    // Show loading state
+    btn.disabled = true;
+    btnText.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Testing...';
+    resultDiv.classList.add('hidden');
+    
+    fetch('{{ route("connect.ea-logger.test-ajax") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({ account_id: accountId })
+    })
+    .then(r => r.json())
+    .then(data => {
+        // Reset button
+        btn.disabled = false;
+        btnText.innerHTML = 'Test Koneksi';
+        
+        // Show result
+        resultDiv.classList.remove('hidden');
+        
+        if (data.type === 'success') {
+            resultDiv.innerHTML = `
+                <div class="p-4 rounded-lg bg-emerald-900/30 border border-emerald-600/50">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-check-circle text-emerald-400 text-lg"></i>
+                        <span class="text-emerald-400 font-semibold">${data.message}</span>
+                    </div>
+                    ${data.details ? `
+                        <div class="text-xs space-y-1 mt-2 text-emerald-300/80">
+                            <div><i class="fas fa-server mr-2 text-emerald-400/60"></i>Server URL: <code class="bg-gray-800 px-1 rounded">${data.details.server_url}</code></div>
+                            <div><i class="fas fa-clock mr-2 text-emerald-400/60"></i>Server Time: ${data.details.server_time}</div>
+                            <div><i class="fas fa-chart-line mr-2 text-emerald-400/60"></i>Total Trades: ${data.details.total_trades?.toLocaleString()}</div>
+                        </div>
+                    ` : ''}
+                    <p class="text-xs text-emerald-300/70 mt-3">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        EA Logger siap digunakan. Pastikan EA sudah di-attach ke chart dan WebRequest URL sudah ditambahkan.
+                    </p>
+                </div>
+            `;
+            showToast(data.message, 'success');
+        } else {
+            resultDiv.innerHTML = `
+                <div class="p-4 rounded-lg bg-red-900/30 border border-red-600/50">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-times-circle text-red-400 text-lg"></i>
+                        <span class="text-red-400 font-semibold">${data.message}</span>
+                    </div>
+                    ${data.hint ? `
+                        <p class="text-xs text-red-300/80 mt-2">
+                            <i class="fas fa-lightbulb mr-1 text-yellow-400"></i>
+                            ${data.hint}
+                        </p>
+                    ` : ''}
+                    <div class="mt-3 text-xs text-red-300/60">
+                        <p><strong>Troubleshooting:</strong></p>
+                        <ol class="list-decimal ml-4 space-y-1 mt-1">
+                            <li>Pastikan EA sudah di-attach ke chart</li>
+                            <li>Cek WebRequest URL di MT4/MT5 Options</li>
+                            <li>Pastikan token yang diinput benar</li>
+                            <li>Cek log EA di tab "Experts" MT4/MT5</li>
+                        </ol>
+                    </div>
+                </div>
+            `;
+            showToast(data.message, 'error');
+        }
+    })
+    .catch(err => {
+        btn.disabled = false;
+        btnText.innerHTML = 'Test Koneksi';
+        resultDiv.classList.remove('hidden');
+        resultDiv.innerHTML = `
+            <div class="p-4 rounded-lg bg-red-900/30 border border-red-600/50">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-exclamation-triangle text-red-400"></i>
+                    <span class="text-red-400">Terjadi kesalahan. Coba refresh halaman dan ulangi.</span>
+                </div>
+            </div>
+        `;
+        console.error('Test connection error:', err);
     });
 }
 </script>
