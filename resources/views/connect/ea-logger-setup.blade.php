@@ -244,7 +244,7 @@
 
 @endsection
 
-@section('scripts')
+@push('scripts')
 <script>
 function copyToken() {
     const tokenEl = document.getElementById('tokenDisplay');
@@ -354,4 +354,4 @@ function testConnection(accountId) {
     });
 }
 </script>
-@endsection
+@endpush
