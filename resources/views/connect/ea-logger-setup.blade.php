@@ -268,9 +268,8 @@ function testConnection(accountId) {
     const btnText = document.getElementById('testBtnText');
     const resultDiv = document.getElementById('testResult');
     
-    // Show loading state
     btn.disabled = true;
-    btnText.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Testing...';
+    btnText.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Mengecek...';
     resultDiv.classList.add('hidden');
     
     fetch('{{ route("connect.ea-logger.test-ajax") }}', {
@@ -283,59 +282,127 @@ function testConnection(accountId) {
     })
     .then(r => r.json())
     .then(data => {
-        // Reset button
         btn.disabled = false;
         btnText.innerHTML = 'Test Koneksi';
-        
-        // Show result
         resultDiv.classList.remove('hidden');
+
+        const s = data.status;
         
-        if (data.type === 'success') {
+        if (s === 'connected') {
+            // EA aktif dan terhubung
             resultDiv.innerHTML = `
                 <div class="p-4 rounded-lg bg-emerald-900/30 border border-emerald-600/50">
-                    <div class="flex items-center gap-2 mb-2">
-                        <i class="fas fa-check-circle text-emerald-400 text-lg"></i>
-                        <span class="text-emerald-400 font-semibold">${data.message}</span>
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span class="text-emerald-400 font-semibold">${data.title}</span>
                     </div>
-                    ${data.details ? `
-                        <div class="text-xs space-y-1 mt-2 text-emerald-300/80">
-                            <div><i class="fas fa-server mr-2 text-emerald-400/60"></i>Server URL: <code class="bg-gray-800 px-1 rounded">${data.details.server_url}</code></div>
-                            <div><i class="fas fa-clock mr-2 text-emerald-400/60"></i>Server Time: ${data.details.server_time}</div>
-                            <div><i class="fas fa-chart-line mr-2 text-emerald-400/60"></i>Total Trades: ${data.details.total_trades?.toLocaleString()}</div>
+                    <p class="text-xs text-emerald-300/80 mb-3">${data.message}</p>
+                    <div class="text-xs space-y-1.5 p-3 rounded-lg bg-emerald-900/20">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-user-tag text-emerald-400/60 w-4"></i>
+                            <span class="text-emerald-300/60">Akun:</span>
+                            <span class="text-white">${data.details.account}</span>
                         </div>
-                    ` : ''}
-                    <p class="text-xs text-emerald-300/70 mt-3">
-                        <i class="fas fa-info-circle mr-1"></i>
-                        EA Logger siap digunakan. Pastikan EA sudah di-attach ke chart dan WebRequest URL sudah ditambahkan.
-                    </p>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-clock text-emerald-400/60 w-4"></i>
+                            <span class="text-emerald-300/60">Terakhir sync:</span>
+                            <span class="text-white">${data.details.last_sync}</span>
+                            <span class="text-emerald-400">(${data.details.last_sync_ago})</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-chart-line text-emerald-400/60 w-4"></i>
+                            <span class="text-emerald-300/60">Total trade tersinkron:</span>
+                            <span class="text-white font-semibold">${data.details.total_trades.toLocaleString()}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-server text-emerald-400/60 w-4"></i>
+                            <span class="text-emerald-300/60">Server:</span>
+                            <code class="bg-gray-800 px-1.5 py-0.5 rounded text-cyan-400">${data.details.server_url}</code>
+                        </div>
+                    </div>
                 </div>
             `;
-            showToast(data.message, 'success');
-        } else {
+            showToast(data.title, 'success');
+        }
+        else if (s === 'disconnected') {
+            // Server OK tapi EA tidak aktif
             resultDiv.innerHTML = `
-                <div class="p-4 rounded-lg bg-red-900/30 border border-red-600/50">
-                    <div class="flex items-center gap-2 mb-2">
-                        <i class="fas fa-times-circle text-red-400 text-lg"></i>
-                        <span class="text-red-400 font-semibold">${data.message}</span>
+                <div class="p-4 rounded-lg bg-yellow-900/30 border border-yellow-600/50">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-3 h-3 rounded-full bg-yellow-400"></span>
+                        <span class="text-yellow-400 font-semibold">${data.title}</span>
+                    </div>
+                    <p class="text-xs text-yellow-300/80 mb-3">${data.message}</p>
+                    <div class="text-xs space-y-1.5 p-3 rounded-lg bg-yellow-900/20 mb-3">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-user-tag text-yellow-400/60 w-4"></i>
+                            <span class="text-yellow-300/60">Akun:</span>
+                            <span class="text-white">${data.details.account}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-clock text-yellow-400/60 w-4"></i>
+                            <span class="text-yellow-300/60">Terakhir sync:</span>
+                            <span class="text-white">${data.details.last_sync}</span>
+                            <span class="text-yellow-400">(${data.details.last_sync_ago})</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-chart-line text-yellow-400/60 w-4"></i>
+                            <span class="text-yellow-300/60">Total trade:</span>
+                            <span class="text-white">${data.details.total_trades.toLocaleString()}</span>
+                        </div>
                     </div>
                     ${data.hint ? `
-                        <p class="text-xs text-red-300/80 mt-2">
-                            <i class="fas fa-lightbulb mr-1 text-yellow-400"></i>
-                            ${data.hint}
-                        </p>
+                        <div class="text-xs p-3 rounded-lg bg-gray-900/50 border border-yellow-700/30">
+                            <i class="fas fa-lightbulb text-yellow-400 mr-1"></i>
+                            <span class="text-yellow-300">${data.hint}</span>
+                        </div>
                     ` : ''}
-                    <div class="mt-3 text-xs text-red-300/60">
-                        <p><strong>Troubleshooting:</strong></p>
-                        <ol class="list-decimal ml-4 space-y-1 mt-1">
-                            <li>Pastikan EA sudah di-attach ke chart</li>
-                            <li>Cek WebRequest URL di MT4/MT5 Options</li>
-                            <li>Pastikan token yang diinput benar</li>
-                            <li>Cek log EA di tab "Experts" MT4/MT5</li>
+                </div>
+            `;
+            showToast(data.title, 'error');
+        }
+        else if (s === 'not_setup') {
+            // Server OK tapi EA belum pernah terhubung
+            resultDiv.innerHTML = `
+                <div class="p-4 rounded-lg bg-cyan-900/30 border border-cyan-600/50">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-3 h-3 rounded-full bg-cyan-400"></span>
+                        <span class="text-cyan-400 font-semibold">${data.title}</span>
+                    </div>
+                    <p class="text-xs text-cyan-300/80 mb-3">${data.message}</p>
+                    <div class="text-xs p-3 rounded-lg bg-cyan-900/20">
+                        <p class="text-cyan-300 font-medium mb-2"><i class="fas fa-clipboard-list mr-1"></i>Langkah setup EA Logger:</p>
+                        <ol class="space-y-1.5 ml-4">
+                            ${data.steps.map((step, i) => `
+                                <li class="flex items-start gap-2">
+                                    <span class="w-5 h-5 rounded-full bg-cyan-600/30 text-cyan-400 text-[10px] flex items-center justify-center shrink-0 mt-0.5">${i+1}</span>
+                                    <span class="text-cyan-200">${step}</span>
+                                </li>
+                            `).join('')}
                         </ol>
                     </div>
                 </div>
             `;
-            showToast(data.message, 'error');
+            showToast(data.title, 'info');
+        }
+        else {
+            // Server error
+            resultDiv.innerHTML = `
+                <div class="p-4 rounded-lg bg-red-900/30 border border-red-600/50">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-3 h-3 rounded-full bg-red-400"></span>
+                        <span class="text-red-400 font-semibold">${data.title}</span>
+                    </div>
+                    <p class="text-xs text-red-300/80 mb-2">${data.message}</p>
+                    ${data.hint ? `
+                        <div class="text-xs p-3 rounded-lg bg-gray-900/50 border border-red-700/30">
+                            <i class="fas fa-lightbulb text-yellow-400 mr-1"></i>
+                            <span class="text-red-300">${data.hint}</span>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            showToast(data.title, 'error');
         }
     })
     .catch(err => {

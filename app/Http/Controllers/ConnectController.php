@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\JournalEntry;
+use App\Models\TradeHistory;
 use App\Models\TradingAccount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -171,11 +172,19 @@ class ConnectController extends Controller
     }
 
     /**
-     * Perform the actual heartbeat connection test
+     * Check EA connection status:
+     * - Apakah server API bisa dijangkau?
+     * - Apakah token valid?
+     * - Apakah EA Logger aktif mengirim data dari MT4/MT5?
      */
     private function performConnectionTest(TradingAccount $account): array
     {
         $serverUrl = config('app.url');
+
+        // Step 1: Cek apakah server API bisa dijangkau & token valid
+        $apiOk = false;
+        $apiMessage = '';
+        $apiHint = '';
 
         try {
             $response = Http::withHeaders([
@@ -186,50 +195,96 @@ class ConnectController extends Controller
               ->post($serverUrl . '/api/ea/heartbeat');
 
             if ($response->successful()) {
-                $data = $response->json();
-                $serverTime = $data['server_time'] ?? '-';
-                $pendingTrades = $data['pending_trades'] ?? 0;
-
-                return [
-                    'type' => 'success',
-                    'message' => 'Koneksi berhasil!',
-                    'details' => [
-                        'server_time' => $serverTime,
-                        'total_trades' => $pendingTrades,
-                        'server_url' => $serverUrl,
-                    ],
-                ];
+                $apiOk = true;
+            } else {
+                $status = $response->status();
+                if ($status === 401) {
+                    $apiMessage = 'Token tidak valid';
+                    $apiHint = 'Generate token baru, lalu update parameter EA di MT4/MT5.';
+                } else {
+                    $apiMessage = "Server merespon HTTP {$status}";
+                    $apiHint = 'Coba lagi dalam beberapa saat.';
+                }
             }
-
-            $status = $response->status();
-            $body = $response->body();
-            $hint = '';
-
-            if ($status === 401) {
-                $hint = 'Token tidak valid. Coba generate token baru.';
-            } elseif ($status === 419) {
-                $hint = 'CSRF token expired. Refresh halaman dan coba lagi.';
-            } elseif ($status >= 500) {
-                $hint = 'Server error. Coba lagi nanti.';
-            }
-
-            return [
-                'type' => 'error',
-                'message' => "Gagal terhubung (HTTP {$status})",
-                'hint' => $hint,
-            ];
         } catch (\Illuminate\Http\Client\ConnectionException $e) {
-            return [
-                'type' => 'error',
-                'message' => 'Tidak bisa terhubung ke server',
-                'hint' => 'Pastikan server berjalan dan URL benar. URL saat ini: ' . $serverUrl,
-            ];
+            $apiMessage = 'Server tidak bisa dijangkau';
+            $apiHint = 'Pastikan server berjalan. URL: ' . $serverUrl;
         } catch (\Exception $e) {
+            $apiMessage = 'Gagal menghubungi server';
+            $apiHint = 'Cek koneksi internet dan coba lagi.';
+        }
+
+        // Step 2: Cek apakah EA aktif mengirim data
+        $eaActive = false;
+        $eaStatus = 'never'; // never | inactive | active
+        $lastSync = $account->last_synced_at;
+        $totalTrades = TradeHistory::where('trading_account_id', $account->id)->count();
+
+        if ($lastSync) {
+            $minutesAgo = $lastSync->diffInMinutes(now());
+            if ($minutesAgo <= 10) {
+                $eaActive = true;
+                $eaStatus = 'active';
+            } else {
+                $eaStatus = 'inactive';
+            }
+        }
+
+        // Build result
+        if ($apiOk && $eaActive) {
             return [
-                'type' => 'error',
-                'message' => 'Gagal koneksi: ' . $e->getMessage(),
-                'hint' => 'Cek konfigurasi server dan coba lagi.',
+                'status' => 'connected',
+                'title' => 'EA Logger Terhubung & Aktif',
+                'message' => 'Akun trading sudah terhubung ke server. EA Logger sedang mengirim data trade dari MT4/MT5.',
+                'details' => [
+                    'account' => $account->broker . ' (' . $account->account_number . ')',
+                    'last_sync' => $lastSync?->format('d M Y, H:i'),
+                    'last_sync_ago' => $lastSync?->diffForHumans(),
+                    'total_trades' => $totalTrades,
+                    'server_url' => $serverUrl,
+                ],
             ];
         }
+
+        if ($apiOk && $eaStatus === 'inactive') {
+            return [
+                'status' => 'disconnected',
+                'title' => 'Server OK, tapi EA Tidak Aktif',
+                'message' => 'Server bisa dijangkau dan token valid, tapi EA Logger belum mengirim data baru.',
+                'details' => [
+                    'account' => $account->broker . ' (' . $account->account_number . ')',
+                    'last_sync' => $lastSync?->format('d M Y, H:i'),
+                    'last_sync_ago' => $lastSync?->diffForHumans(),
+                    'total_trades' => $totalTrades,
+                ],
+                'hint' => 'Pastikan EA Logger masih ter-attach di chart MT4/MT5 dan terminal sedang berjalan.',
+            ];
+        }
+
+        if ($apiOk && $eaStatus === 'never') {
+            return [
+                'status' => 'not_setup',
+                'title' => 'Server OK, EA Belum Pernah Terhubung',
+                'message' => 'Server bisa dijangkau, tapi EA Logger belum pernah mengirim data dari akun ini.',
+                'details' => [
+                    'account' => $account->broker . ' (' . $account->account_number . ')',
+                ],
+                'steps' => [
+                    'Download EA Logger (langkah 3)',
+                    'Copy file ke folder MQL4/Indicators atau MQL5/Indicators',
+                    'Compile di MetaEditor (F7)',
+                    'Attach ke chart, paste API Token di parameter',
+                    'Tambahkan URL ke Allow WebRequest di Options',
+                ],
+            ];
+        }
+
+        // API not reachable
+        return [
+            'status' => 'server_error',
+            'title' => 'Tidak Bisa Terhubung ke Server',
+            'message' => $apiMessage,
+            'hint' => $apiHint,
+        ];
     }
 }
