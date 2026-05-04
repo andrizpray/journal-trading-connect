@@ -6,6 +6,7 @@ use App\Models\TradingAccount;
 use App\Models\TradeHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class EaApiController extends Controller
 {
@@ -192,6 +193,11 @@ class EaApiController extends Controller
                 $saved++;
             } catch (\Exception $e) {
                 $errors++;
+                Log::warning('EA batch trade skipped due to error', [
+                    'account_id' => $account->id,
+                    'ticket' => $tradeData['ticket'] ?? null,
+                    'error' => $e->getMessage(),
+                ]);
             }
         }
 

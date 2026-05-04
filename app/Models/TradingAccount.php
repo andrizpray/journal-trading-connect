@@ -16,7 +16,7 @@ class TradingAccount extends Model
         'decimal_places_fx',
         'decimal_places_jpy',
         'decimal_places_metal',
-        'api_token',
+        'api_token_hash',
         'sync_method',
         'is_active',
         'last_synced_at',
@@ -32,13 +32,19 @@ class TradingAccount extends Model
 
     protected $hidden = [
         'api_token',
+        'api_token_hash',
     ];
+
+    public $plain_api_token;
 
     protected static function booted(): void
     {
         static::creating(function ($account) {
-            if (empty($account->api_token)) {
-                $account->api_token = bin2hex(random_bytes(32));
+            if (empty($account->api_token_hash)) {
+                $token = self::generateApiToken();
+                $account->api_token_hash = hash('sha256', $token);
+                $account->api_token = null;
+                $account->plain_api_token = $token;
             }
         });
     }
@@ -48,9 +54,23 @@ class TradingAccount extends Model
      */
     public function regenerateToken(): string
     {
-        $this->api_token = bin2hex(random_bytes(32));
+        $plainToken = self::generateApiToken();
+        $this->api_token_hash = hash('sha256', $plainToken);
+        $this->api_token = null;
         $this->save();
-        return $this->api_token;
+
+        return $plainToken;
+    }
+
+    public function matchesApiToken(string $plainToken): bool
+    {
+        return !empty($this->api_token_hash)
+            && hash_equals($this->api_token_hash, hash('sha256', $plainToken));
+    }
+
+    private static function generateApiToken(): string
+    {
+        return bin2hex(random_bytes(32));
     }
 
     public function user()

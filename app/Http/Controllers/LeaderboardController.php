@@ -81,7 +81,6 @@ class LeaderboardController extends Controller
                 $q->where('result', 'loss');
             },
         ], 'profit_loss')
-        ->having('total_trades', '>', 0)
         ->get()
         ->map(function ($user) {
             $winRate = $user->total_trades > 0

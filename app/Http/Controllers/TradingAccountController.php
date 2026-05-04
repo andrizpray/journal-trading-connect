@@ -36,10 +36,12 @@ class TradingAccountController extends Controller
         $validated['decimal_places_jpy'] = (int) ($validated['decimal_places_jpy'] ?? 3);
         $validated['decimal_places_metal'] = (int) ($validated['decimal_places_metal'] ?? 2);
 
-        TradingAccount::create($validated);
+        $account = TradingAccount::create($validated);
 
-        return redirect()->route('trading-accounts.index')
-            ->with('success', 'Akun trading berhasil ditambahkan!');
+        return redirect()->route('connect.ea-logger', ['account_id' => $account->id])
+            ->with('success', 'Akun trading berhasil ditambahkan! Simpan token ini ke pengaturan EA Anda.')
+            ->with('new_token', $account->plain_api_token)
+            ->with('regenerated_account_id', $account->id);
     }
 
     public function update(Request $request, $id)

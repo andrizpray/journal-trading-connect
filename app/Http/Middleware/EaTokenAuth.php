@@ -11,7 +11,7 @@ class EaTokenAuth
 {
     /**
      * Validasi request dari EA menggunakan Bearer token.
-     * Token = api_token dari trading_accounts.
+     * Token divalidasi melalui hash SHA-256 di trading_accounts.
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -24,9 +24,25 @@ class EaTokenAuth
             ], 401);
         }
 
-        $account = TradingAccount::where('api_token', $token)
+        $tokenHash = hash('sha256', $token);
+
+        $account = TradingAccount::where('api_token_hash', $tokenHash)
             ->where('is_active', true)
             ->first();
+
+        // Backward compatibility: migrate legacy plaintext token on first valid request.
+        if (!$account) {
+            $account = TradingAccount::where('api_token', $token)
+                ->where('is_active', true)
+                ->first();
+
+            if ($account) {
+                $account->forceFill([
+                    'api_token_hash' => $tokenHash,
+                    'api_token' => null,
+                ])->saveQuietly();
+            }
+        }
 
         if (!$account) {
             return response()->json([

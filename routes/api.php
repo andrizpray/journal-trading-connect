@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('ea.token')->group(function () {
+Route::middleware(['ea.token', 'throttle:ea-api'])->group(function () {
     // Ping — cek koneksi tanpa auth berat
     Route::get('/ea/ping', [EaApiController::class, 'ping']);
 

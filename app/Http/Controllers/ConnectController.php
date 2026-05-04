@@ -149,7 +149,7 @@ class ConnectController extends Controller
         $account = TradingAccount::where('user_id', Auth::id())
             ->findOrFail($request->account_id);
 
-        $result = $this->performConnectionTest($account);
+        $result = $this->performConnectionTest($account, $request);
 
         return back()->with($result['type'], $result['message']);
     }
@@ -166,7 +166,7 @@ class ConnectController extends Controller
         $account = TradingAccount::where('user_id', Auth::id())
             ->findOrFail($request->account_id);
 
-        $result = $this->performConnectionTest($account);
+        $result = $this->performConnectionTest($account, $request);
 
         return response()->json($result);
     }
@@ -177,9 +177,25 @@ class ConnectController extends Controller
      * - Apakah token valid?
      * - Apakah EA Logger aktif mengirim data dari MT4/MT5?
      */
-    private function performConnectionTest(TradingAccount $account): array
+    private function performConnectionTest(TradingAccount $account, Request $request): array
     {
         $serverUrl = config('app.url');
+        $token = null;
+
+        $sessionToken = $request->session()->get('new_token');
+        $sessionAccountId = (int) $request->session()->get('regenerated_account_id');
+        if (!empty($sessionToken) && $sessionAccountId === (int) $account->id) {
+            $token = $sessionToken;
+        }
+
+        if (!$token) {
+            return [
+                'status' => 'token_unavailable',
+                'title' => 'Token Tidak Tersedia',
+                'message' => 'Untuk alasan keamanan, token lama tidak bisa ditampilkan lagi.',
+                'hint' => 'Klik "Generate Token Baru", update EA di MT4/MT5, lalu test koneksi lagi.',
+            ];
+        }
 
         // Step 1: Cek apakah server API bisa dijangkau & token valid
         $apiOk = false;
@@ -188,10 +204,9 @@ class ConnectController extends Controller
 
         try {
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $account->api_token,
+                'Authorization' => 'Bearer ' . $token,
                 'Accept' => 'application/json',
-            ])->withoutVerifying()
-              ->timeout(10)
+            ])->timeout(10)
               ->get($serverUrl . '/api/ea/ping');
 
             if ($response->successful()) {

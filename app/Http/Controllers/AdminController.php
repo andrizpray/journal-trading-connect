@@ -27,10 +27,10 @@ class AdminController extends Controller
             ->take(10)
             ->get();
 
-        // Top users by P&L
+        // Top users by P&L (whereHas: SQLite rejects HAVING on withCount aliases without GROUP BY)
         $topUsers = User::withSum('tradeHistories as total_pnl', 'profit_loss')
             ->withCount('tradeHistories')
-            ->having('trade_histories_count', '>', 0)
+            ->whereHas('tradeHistories')
             ->orderByDesc('total_pnl')
             ->take(10)
             ->get();

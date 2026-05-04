@@ -47,11 +47,25 @@ class ImportController extends Controller
         $autoJournal = $request->has('auto_journal');
 
         $path = $file->getRealPath();
-        $allRows = array_map('str_getcsv', file($path));
+        
+        $allRows = [];
+        if (($handle = fopen($path, "r")) !== false) {
+            while (($data = fgetcsv($handle, 10000, ",")) !== false) {
+                $allRows[] = $data;
+            }
+            fclose($handle);
+        }
 
         if (count($allRows) < 2) {
             return back()->with('error', 'File CSV kosong atau tidak valid.');
         }
+
+        // Preload all existing tickets to prevent N+1 query performance issues (which causes "stuck" imports)
+        $existingTickets = TradeHistory::where('user_id', Auth::id())
+            ->where('trading_account_id', $account->id)
+            ->pluck('ticket')
+            ->flip()
+            ->toArray();
 
         // Detect MT5 report format (has "Positions" header before actual data)
         $headerRowIdx = 0;
@@ -99,20 +113,17 @@ class ImportController extends Controller
             }
 
             // Skip already imported
-            $exists = TradeHistory::where('user_id', Auth::id())
-                ->where('trading_account_id', $account->id)
-                ->where('ticket', $ticket)
-                ->exists();
-
-            if ($exists) {
+            if (isset($existingTickets[$ticket])) {
                 $skipped++;
                 continue;
             }
 
             try {
-                $openDate = $this->parseDate($row[$colMap['open_date']] ?? '');
-                $closeDate = $this->parseDate($row[$colMap['close_date']] ?? '');
-                $profitLoss = (float) str_replace([',', ' '], '', $row[$colMap['profit']] ?? 0);
+                $getVal = fn($key, $default = '') => $colMap[$key] !== false ? ($row[$colMap[$key]] ?? $default) : $default;
+
+                $openDate = $this->parseDate($getVal('open_date'));
+                $closeDate = $this->parseDate($getVal('close_date'));
+                $profitLoss = (float) str_replace([',', ' '], '', $getVal('profit', '0'));
 
                 $result = 'break_even';
                 if ($profitLoss > 0) {
@@ -132,7 +143,7 @@ class ImportController extends Controller
                 }
 
                 // Normalize trade type
-                $rawType = strtolower(trim($row[$colMap['type']] ?? 'buy'));
+                $rawType = strtolower(trim($getVal('type', 'buy')));
                 $tradeType = $this->normalizeTradeType($rawType);
 
                 $trade = TradeHistory::create([
@@ -141,19 +152,19 @@ class ImportController extends Controller
                     'ticket' => $ticket,
                     'open_date' => $openDate,
                     'close_date' => $closeDate,
-                    'currency_pair' => trim($row[$colMap['symbol']] ?? ''),
+                    'currency_pair' => trim($getVal('symbol')),
                     'trade_type' => $tradeType,
-                    'lot_size' => (float) str_replace(',', '', $row[$colMap['lot']] ?? 0),
-                    'open_price' => $this->parseFloat($row[$colMap['open_price']] ?? null),
-                    'close_price' => $this->parseFloat($row[$colMap['close_price']] ?? null),
-                    'stop_loss' => $this->parseFloat($row[$colMap['sl']] ?? null),
-                    'take_profit' => $this->parseFloat($row[$colMap['tp']] ?? null),
-                    'swap' => (float) str_replace(',', '', $row[$colMap['swap']] ?? 0),
-                    'commission' => (float) str_replace(',', '', $row[$colMap['commission']] ?? 0),
+                    'lot_size' => (float) str_replace(',', '', $getVal('lot', '0')),
+                    'open_price' => $this->parseFloat($getVal('open_price', null)),
+                    'close_price' => $this->parseFloat($getVal('close_price', null)),
+                    'stop_loss' => $this->parseFloat($getVal('sl', null)),
+                    'take_profit' => $this->parseFloat($getVal('tp', null)),
+                    'swap' => (float) str_replace(',', '', $getVal('swap', '0')),
+                    'commission' => (float) str_replace(',', '', $getVal('commission', '0')),
                     'profit_loss' => $profitLoss,
                     'result' => $result,
                     'duration_minutes' => $duration,
-                    'comment' => trim($row[$colMap['comment']] ?? ''),
+                    'comment' => trim($getVal('comment')),
                     'imported_at' => now(),
                 ]);
 
@@ -238,6 +249,7 @@ class ImportController extends Controller
 
         $result = [];
         foreach ($mapping as $field => $aliases) {
+            $result[$field] = false; // Initialize to false by default
             $found = false;
             foreach ($aliases as $alias) {
                 $index = array_search($alias, $header);
@@ -252,11 +264,6 @@ class ImportController extends Controller
             if (!$found && in_array($field, ['symbol', 'profit'])) {
                 return null;
             }
-        }
-
-        // Auto-generate ticket column if not found (TradingView etc.)
-        if (!isset($result['ticket'])) {
-            $result['ticket'] = false; // will be auto-generated per row
         }
 
         return $result;

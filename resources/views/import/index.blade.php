@@ -13,6 +13,18 @@
     </p>
 </div>
 
+{{-- Flash messages --}}
+@if(session('success'))
+    <div class="mb-6 p-4 rounded-xl bg-emerald-900/30 border border-emerald-700/30 text-emerald-400 text-sm">
+        <i class="fas fa-check-circle mr-2 text-lg"></i>{{ session('success') }}
+    </div>
+@endif
+@if(session('error'))
+    <div class="mb-6 p-4 rounded-xl bg-red-900/30 border border-red-700/30 text-red-400 text-sm">
+        <i class="fas fa-exclamation-circle mr-2 text-lg"></i>{{ session('error') }}
+    </div>
+@endif
+
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
     {{-- Import Form --}}
     <div class="card p-5 sm:p-6 lg:col-span-2">
@@ -28,7 +40,8 @@
             </div>
         @else
             <form action="{{ route('import.upload') }}" method="POST" enctype="multipart/form-data" x-data="{ dragging: false }"
-                  @dragover.prevent="dragging = true" @dragleave.prevent="dragging = false" @drop.prevent="dragging = false">
+                  @dragover.prevent="dragging = true" @dragleave.prevent="dragging = false" @drop.prevent="dragging = false"
+                  onsubmit="handleImportSubmit()">
                 @csrf
 
                 {{-- Account Selector --}}
@@ -75,7 +88,7 @@
                 </div>
 
                 {{-- Submit --}}
-                <button type="submit" id="importBtn" onclick="handleImportSubmit(this)" class="btn-primary w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold">
+                <button type="submit" id="importBtn" class="btn-primary w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold">
                     <i class="fas fa-upload" id="importIcon"></i><span id="importText">Import Sekarang</span>
                 </button>
             </form>
@@ -167,15 +180,20 @@
 </div>
 
 <script>
-function handleImportSubmit(btn) {
+function handleImportSubmit() {
+    var btn = document.getElementById('importBtn');
     var icon = document.getElementById('importIcon');
     var text = document.getElementById('importText');
-    btn.disabled = true;
-    btn.classList.add('opacity-70', 'cursor-not-allowed');
-    icon.className = 'fas fa-spinner fa-spin';
-    text.textContent = 'Mengimport...';
+    
+    // Delay disable to ensure form actually submits first
+    setTimeout(function() {
+        btn.disabled = true;
+        btn.classList.add('opacity-70', 'cursor-not-allowed');
+        icon.className = 'fas fa-spinner fa-spin';
+        text.textContent = 'Mengimport...';
+    }, 10);
 
-    // Reset jika server error (no redirect = error)
+    // Reset jika server error atau timeout
     setTimeout(function() {
         if (btn.disabled) {
             btn.disabled = false;

@@ -2,6 +2,11 @@
 @section('page-title', 'EA Logger Setup')
 
 @section('content')
+@php
+    $freshToken = (session('regenerated_account_id') == ($selectedAccount->id ?? null))
+        ? session('new_token')
+        : null;
+@endphp
 <div class="mb-6">
     <div class="flex items-center gap-3 mb-2">
         <a href="{{ route('connect.index') }}" class="text-cyan-400 hover:text-cyan-300 text-sm">
@@ -116,11 +121,23 @@
             Token ini digunakan oleh EA Logger untuk autentikasi. Jangan bagikan token ke orang lain.
         </p>
         <div class="flex items-center gap-2">
-            <div class="flex-1 p-2 rounded-lg bg-gray-900 font-mono text-xs break-all select-all text-cyan-400" id="tokenDisplay" data-token="{{ $selectedAccount->api_token ?? '' }}">{{ $selectedAccount->api_token ?? '' }}</div>
-            <button onclick="copyToken(event)" class="px-3 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-medium transition" title="Copy token">
-                <i class="fas fa-copy"></i>
-            </button>
+            @if($freshToken)
+                <div class="flex-1 p-2 rounded-lg bg-gray-900 font-mono text-xs break-all select-all text-cyan-400" id="tokenDisplay" data-token="{{ $freshToken }}">{{ $freshToken }}</div>
+                <button onclick="copyToken(event)" class="px-3 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-medium transition" title="Copy token">
+                    <i class="fas fa-copy"></i>
+                </button>
+            @else
+                <div class="flex-1 p-2 rounded-lg bg-gray-900/70 text-xs text-gray-400 border border-gray-700/50">
+                    Token disembunyikan untuk keamanan. Generate token baru untuk melihat dan menyalin token.
+                </div>
+            @endif
         </div>
+        @if($freshToken)
+            <p class="text-[11px] mt-2 text-yellow-300">
+                <i class="fas fa-triangle-exclamation mr-1"></i>
+                Token ini hanya ditampilkan sekali. Simpan segera ke parameter EA.
+            </p>
+        @endif
         <form method="POST" action="{{ route('connect.ea-logger.regenerate-token', $selectedAccount->id) }}" class="mt-3" onsubmit="return confirm('Token lama tidak akan bisa digunakan lagi. Lanjutkan?')">
             @csrf
             <button type="submit" class="text-xs text-yellow-400 hover:text-yellow-300 transition">
@@ -247,8 +264,10 @@
 function copyToken(event) {
     const tokenEl = document.getElementById('tokenDisplay');
     const text = tokenEl.getAttribute('data-token');
-    navigator.clipboard.writeText(text).then(() => {
-        const btn = event.target.closest('button');
+    const btn = event.currentTarget || event.target.closest('button');
+
+    const setCopiedState = () => {
+        if (!btn) return;
         const orig = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-check"></i>';
         btn.classList.remove('bg-cyan-600');
@@ -258,16 +277,50 @@ function copyToken(event) {
             btn.classList.remove('bg-emerald-600');
             btn.classList.add('bg-cyan-600');
         }, 2000);
-    }).catch(() => {
-        // Fallback: select text in div
-        const range = document.createRange();
-        range.selectNodeContents(tokenEl);
-        const sel = window.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(range);
-        document.execCommand('copy');
-        sel.removeAllRanges();
-    });
+    };
+
+    if (!text) {
+        showToast('Token kosong atau tidak ditemukan.', 'error');
+        return;
+    }
+
+    const fallbackCopy = () => {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.setAttribute('readonly', '');
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-9999px';
+        document.body.appendChild(textArea);
+        textArea.select();
+
+        let copied = false;
+        try {
+            copied = document.execCommand('copy');
+        } catch (_) {
+            copied = false;
+        }
+
+        document.body.removeChild(textArea);
+
+        if (copied) {
+            setCopiedState();
+            showToast('Token berhasil disalin.', 'success');
+        } else {
+            showToast('Gagal menyalin otomatis. Silakan copy manual.', 'error');
+        }
+    };
+
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text)
+            .then(() => {
+                setCopiedState();
+                showToast('Token berhasil disalin.', 'success');
+            })
+            .catch(() => fallbackCopy());
+        return;
+    }
+
+    fallbackCopy();
 }
 
 function testConnection(accountId) {

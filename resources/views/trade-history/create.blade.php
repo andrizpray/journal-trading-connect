@@ -117,11 +117,11 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs font-medium mb-1" style="color: var(--text-secondary);">Open Date</label>
-                    <input type="datetime-local" name="open_date" class="dark-input w-full text-sm">
+                    <input type="text" name="open_date" class="dark-input w-full text-sm" placeholder="YYYY-MM-DD HH:MM:SS">
                 </div>
                 <div>
                     <label class="block text-xs font-medium mb-1" style="color: var(--text-secondary);">Close Date</label>
-                    <input type="datetime-local" name="close_date" class="dark-input w-full text-sm">
+                    <input type="text" name="close_date" class="dark-input w-full text-sm" placeholder="YYYY-MM-DD HH:MM:SS">
                 </div>
                 <div>
                     <label class="block text-xs font-medium mb-1" style="color: var(--text-secondary);">Swap</label>

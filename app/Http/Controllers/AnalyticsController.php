@@ -70,11 +70,24 @@ class AnalyticsController extends Controller
         // ==============================
         // 2.4 — Heatmap: day × hour
         // ==============================
-        $heatmapRaw = (clone $query)
+        $heatmapTrades = (clone $query)
             ->whereNotNull('close_date')
-            ->selectRaw('DAYOFWEEK(close_date) as dow, HOUR(close_date) as hour, COUNT(*) as trades, SUM(profit_loss) as pnl')
-            ->groupBy('dow', 'hour')
-            ->get();
+            ->get(['close_date', 'profit_loss']);
+
+        $heatmapRawGrouped = collect();
+        foreach ($heatmapTrades as $trade) {
+            // MySQL DAYOFWEEK is 1=Sunday, Carbon dayOfWeek is 0=Sunday
+            $dow = $trade->close_date->dayOfWeek + 1;
+            $hour = $trade->close_date->hour;
+            
+            $key = $dow . '-' . $hour;
+            if (!isset($heatmapRawGrouped[$key])) {
+                $heatmapRawGrouped[$key] = (object)['dow' => $dow, 'hour' => $hour, 'trades' => 0, 'pnl' => 0];
+            }
+            $heatmapRawGrouped[$key]->trades++;
+            $heatmapRawGrouped[$key]->pnl += $trade->profit_loss;
+        }
+        $heatmapRaw = $heatmapRawGrouped->values();
 
         // Build 7×24 matrix
         $dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
@@ -122,7 +135,7 @@ class AnalyticsController extends Controller
         // Current streak
         $currentStreak = 0;
         $currentStreakType = '';
-        foreach ($tradesSorted as $result) {
+        foreach ($tradesSorted->reverse() as $result) {
             if ($result === 'win' || $result === 'loss') {
                 if (empty($currentStreakType)) {
                     $currentStreakType = $result;
@@ -132,6 +145,8 @@ class AnalyticsController extends Controller
                 } else {
                     break;
                 }
+            } else {
+                break; // break_even breaks the streak
             }
         }
 

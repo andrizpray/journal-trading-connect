@@ -7,6 +7,7 @@ use App\Exports\TradeHistoryExport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
+use Illuminate\Validation\Rule;
 
 class TradeHistoryController extends Controller
 {
@@ -86,7 +87,12 @@ class TradeHistoryController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'trading_account_id' => 'required|exists:trading_accounts,id',
+            'trading_account_id' => [
+                'required',
+                Rule::exists('trading_accounts', 'id')->where(
+                    fn ($query) => $query->where('user_id', Auth::id())
+                ),
+            ],
             'currency_pair' => 'required|string|max:20',
             'trade_type' => 'required|in:buy,sell,buy_limit,sell_limit,buy_stop,sell_stop',
             'lot_size' => 'required|numeric|min:0.01',
