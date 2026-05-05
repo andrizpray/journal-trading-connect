@@ -188,36 +188,61 @@ class ConnectController extends Controller
             $token = $sessionToken;
         }
 
-        if (!$token) {
+        // Fallback: jika session token tidak ada, cek apakah token sudah pernah di-generate.
+        // Jika api_token_hash ada, berarti token valid dan sudah di-set di EA.
+        // Kita tidak bisa ambil token plain dari DB (design: hanya hash yang disimpan),
+        // tapi API call akan memvalidasi sendiri saat EA mengirim request.
+        if (!$token && empty($account->api_token_hash)) {
             return [
                 'status' => 'token_unavailable',
                 'title' => 'Token Tidak Tersedia',
-                'message' => 'Untuk alasan keamanan, token lama tidak bisa ditampilkan lagi.',
-                'hint' => 'Klik "Generate Token Baru", update EA di MT4/MT5, lalu test koneksi lagi.',
+                'message' => 'Token belum pernah di-generate untuk akun ini.',
+                'hint' => 'Klik "Generate Token Baru", copy token-nya, update parameter EA di MT4/MT5, lalu test koneksi lagi.',
             ];
         }
 
         // Step 1: Cek apakah server API bisa dijangkau & token valid
         $apiOk = false;
+        $tokenVerified = false; // true jika kita benar-benar verifikasi token dengan auth
         $apiMessage = '';
         $apiHint = '';
 
         try {
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $token,
-                'Accept' => 'application/json',
-            ])->timeout(10)
-              ->get($serverUrl . '/api/ea/ping');
+            // Jika punya session token (regenerate terbaru), test dengan auth.
+            // Jika tidak punya session token tapi api_token_hash ada, token sudah
+            // di-generate sebelumnya — cukup test reachability tanpa auth.
+            if ($token) {
+                $response = Http::withHeaders([
+                    'Authorization' => 'Bearer ' . $token,
+                    'Accept' => 'application/json',
+                ])->timeout(10)
+                  ->get($serverUrl . '/api/ea/ping');
 
-            if ($response->successful()) {
-                $apiOk = true;
-            } else {
-                $status = $response->status();
-                if ($status === 401) {
-                    $apiMessage = 'Token tidak valid';
-                    $apiHint = 'Generate token baru, lalu update parameter EA di MT4/MT5.';
+                if ($response->successful()) {
+                    $apiOk = true;
+                    $tokenVerified = true;
                 } else {
-                    $apiMessage = "Server merespon HTTP {$status}";
+                    $status = $response->status();
+                    if ($status === 401) {
+                        $apiMessage = 'Token tidak valid';
+                        $apiHint = 'Generate token baru, lalu update parameter EA di MT4/MT5.';
+                    } else {
+                        $apiMessage = "Server merespon HTTP {$status}";
+                        $apiHint = 'Coba lagi dalam beberapa saat.';
+                    }
+                }
+            } else {
+                // Tidak punya plain token (sudah di-hash di DB).
+                // Test reachability dengan request tanpa auth.
+                // Jika server menolak dengan 401, itu artinya server NYALA dan token perlu di-verify
+                // oleh EA (middleware mencegah akses tanpa token — ini normal).
+                // Jika connection error, server mati.
+                $response = Http::timeout(10)->get($serverUrl . '/api/ea/ping');
+                // Kode apapun yang berhasil direach = server up (bukan connection error).
+                // 401 = middleware block = server up dan berjalan normal.
+                $apiOk = in_array($response->status(), [200, 401, 403, 404, 429]);
+                if (!$apiOk) {
+                    $apiMessage = "Server merespon HTTP {$response->status()}";
                     $apiHint = 'Coba lagi dalam beberapa saat.';
                 }
             }
@@ -262,10 +287,13 @@ class ConnectController extends Controller
         }
 
         if ($apiOk && $eaStatus === 'inactive') {
+            $tokenLabel = $tokenVerified
+                ? 'token valid'
+                : 'token sudah di-generate (verifikasi dilakukan otomatis saat EA mengirim data)';
             return [
                 'status' => 'disconnected',
                 'title' => 'Server OK, tapi EA Tidak Aktif',
-                'message' => 'Server bisa dijangkau dan token valid, tapi EA Logger belum mengirim data baru.',
+                'message' => "Server bisa dijangkau dan {$tokenLabel}, tapi EA Logger belum mengirim data baru.",
                 'details' => [
                     'account' => $account->broker . ' (' . $account->account_number . ')',
                     'last_sync' => $lastSync?->format('d M Y, H:i'),
@@ -277,10 +305,13 @@ class ConnectController extends Controller
         }
 
         if ($apiOk && $eaStatus === 'never') {
+            $setupHint = $tokenVerified
+                ? 'EA Logger belum pernah mengirim data dari akun ini.'
+                : 'Token sudah di-generate, tapi EA Logger belum pernah mengirim data. Pastikan EA di MT4/MT5 sudah dikonfigurasi dengan benar.';
             return [
                 'status' => 'not_setup',
                 'title' => 'Server OK, EA Belum Pernah Terhubung',
-                'message' => 'Server bisa dijangkau, tapi EA Logger belum pernah mengirim data dari akun ini.',
+                'message' => "Server bisa dijangkau. {$setupHint}",
                 'details' => [
                     'account' => $account->broker . ' (' . $account->account_number . ')',
                 ],
