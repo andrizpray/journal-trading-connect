@@ -20,14 +20,15 @@ class JournalController extends Controller
             $query->where('result', $request->result);
         }
 
-        // 3.3 — Filter by tag
+        // 3.3 — Filter by tag (escape LIKE special chars)
         if ($request->filled('tag')) {
-            $query->where('tags', 'LIKE', '%' . $request->tag . '%');
+            $tag = str_replace(['%', '_'], ['\\%', '\\_'], $request->tag);
+            $query->where('tags', 'LIKE', '%' . $tag . '%');
         }
 
-        // 3.6 — Search
+        // 3.6 — Search (escape LIKE special chars)
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = str_replace(['%', '_'], ['\\%', '\\_'], $request->search);
             $query->where(function ($q) use ($search) {
                 $q->where('analysis', 'LIKE', '%' . $search . '%')
                   ->orWhere('lesson_learned', 'LIKE', '%' . $search . '%')

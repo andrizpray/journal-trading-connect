@@ -109,7 +109,7 @@ class TradeHistoryController extends Controller
         ]);
 
         $validated['user_id'] = Auth::id();
-        $validated['ticket'] = 'MANUAL-' . now()->format('YmdHis') . '-' . rand(100, 999);
+        $validated['ticket'] = 'MANUAL-' . now()->format('YmdHis') . '-' . bin2hex(random_bytes(4));
         $validated['result'] = $validated['profit_loss'] > 0 ? 'win'
             : ($validated['profit_loss'] < 0 ? 'loss' : 'break_even');
 

@@ -52,6 +52,12 @@
             body {
                 font-family: 'Inter', sans-serif;
                 background-color: var(--bg-primary);
+                background-image:
+                    radial-gradient(at 12% 8%, rgba(6, 182, 212, 0.18) 0px, transparent 50%),
+                    radial-gradient(at 88% 14%, rgba(139, 92, 246, 0.16) 0px, transparent 50%),
+                    radial-gradient(at 70% 92%, rgba(16, 185, 129, 0.12) 0px, transparent 50%),
+                    radial-gradient(at 18% 88%, rgba(59, 130, 246, 0.10) 0px, transparent 55%);
+                background-attachment: fixed;
                 color: var(--text-primary);
             }
 
@@ -813,7 +819,7 @@
             <!-- Main content area -->
             <div class="flex-1 flex flex-col overflow-hidden">
                 <!-- Top header bar -->
-                <header class="h-16 flex items-center justify-between px-3 sm:px-6 border-b flex-shrink-0" style="background-color: var(--bg-secondary); border-color: var(--border-color);">
+                <header class="h-16 flex items-center justify-between px-3 sm:px-6 border-b flex-shrink-0 backdrop-blur-xl supports-[backdrop-filter]:bg-gray-900/60 sticky top-0 z-30 shadow-[0_1px_0_0_rgba(6,182,212,0.06)]" style="background-color: rgba(17, 24, 39, 0.65); border-color: var(--border-color);">
                     <!-- Hamburger button -->
                     <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden text-gray-400 hover:text-white transition-colors">
                         <i class="fas fa-bars text-xl"></i>
@@ -836,16 +842,20 @@
                 <!-- Page content -->
                 <main class="flex-1 overflow-y-auto p-3 sm:p-4 lg:p-6">
                     @if(session('success'))
-                        <div class="mb-4 px-4 py-3 rounded-lg bg-emerald-900/30 border border-emerald-700/50 text-emerald-400 text-sm flex items-center gap-2">
-                            <i class="fas fa-check-circle"></i>
-                            {{ session('success') }}
+                        <div class="mb-4 px-4 py-3 rounded-xl bg-gradient-to-r from-emerald-900/40 via-emerald-900/30 to-transparent border border-emerald-600/40 text-emerald-300 text-sm flex items-center gap-3 backdrop-blur-sm shadow-[0_0_20px_rgba(16,185,129,0.12)]">
+                            <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-300">
+                                <i class="fas fa-check-circle"></i>
+                            </span>
+                            <span class="flex-1">{{ session('success') }}</span>
                         </div>
                     @endif
 
                     @if(session('error'))
-                        <div class="mb-4 px-4 py-3 rounded-lg bg-red-900/30 border border-red-700/50 text-red-400 text-sm flex items-center gap-2">
-                            <i class="fas fa-exclamation-circle"></i>
-                            {{ session('error') }}
+                        <div class="mb-4 px-4 py-3 rounded-xl bg-gradient-to-r from-red-900/40 via-red-900/30 to-transparent border border-red-600/40 text-red-300 text-sm flex items-center gap-3 backdrop-blur-sm shadow-[0_0_20px_rgba(239,68,68,0.12)]">
+                            <span class="flex items-center justify-center w-8 h-8 rounded-lg bg-red-500/20 text-red-300">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </span>
+                            <span class="flex-1">{{ session('error') }}</span>
                         </div>
                     @endif
 
